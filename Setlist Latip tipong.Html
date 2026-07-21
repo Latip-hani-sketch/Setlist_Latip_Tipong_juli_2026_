@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setlist Pro Tiponk 🎸</title>
+    <!-- Font Modern dari Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #0ea5e9;
+            --success: #10b981;
+        }
+
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container { 
+            max-width: 550px; 
+            margin: auto; 
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            padding: 25px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        h2.header-title {
+            text-align: center;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        /* Status Badge Admin / Viewer */
+        .mode-badge {
+            font-size: 11px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+        }
+        .mode-viewer { background: #fef3c7; color: #b45309; }
+        .mode-admin { background: #d1fae5; color: #047857; }
+
+        /* Tombol Tambah Lagu */
+        .btn-add-global {
+            width: 100%;
+            background: var(--text-main);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-add-global:hover { background: #374151; transform: translateY(-2px); }
+
+        /* Main Folder Button */
+        .main-btn {
+            color: white;
+            padding: 18px 20px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 16px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+        }
+        .main-btn:hover { box-shadow: 0 12px 25px rgba(99, 102, 241, 0.3); transform: translateY(-2px); }
+
+        /* Container Playlist */
+        .playlist-container {
+            display: block;
+            padding-bottom: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Search Box */
+        .search-local { position: relative; margin-bottom: 15px; }
+        .search-local input {
+            width: 100%;
+            padding: 14px 15px 14px 40px;
+            background: #f9fafb;
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        .search-local input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: white;
+        }
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 16px;
+        }
+
+        /* Grid Folders */
+        .folders-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .sub-btn {
+            background: #f8fafc;
+            border: 2px solid var(--border-color);
+            color: var(--text-main);
+            padding: 15px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            text-align: center;
+        }
+        .sub-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
+        
+        .btn-pop-indo:hover { border-color: var(--primary); background: #e0e7ff; }
+        .btn-pop-inggris:hover { border-color: #06b6d4; background: #cffafe; }
+        .btn-ambyar:hover { border-color: #ec4899; background: #fce7f3; }
+        .btn-lawas:hover { border-color: #f59e0b; background: #fef3c7; }
+        
+        .folder-icon { font-size: 26px; }
+
+        .sub-content {
+            display: none;
+            background: #f9fafb;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* List Lagu */
+        ul { list-style: none; padding: 0; margin: 0; }
+        .song-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .song-item:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(99,102,241,0.08); }
+        
+        .song-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .song-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-main);
+            flex: 1;
+        }
+
+        .song-badge-detail {
+            font-size: 11px;
+            background: #f1f5f9;
+            color: var(--info);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            margin-right: 10px;
+            border: 1px solid #e0f2fe;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .music-icon { opacity: 0.5; font-size: 12px; flex-shrink: 0; }
+
+        /* Detail Lagu */
+        .song-details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .info-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 8px;
+            align-items: flex-start;
+        }
+        .info-row:last-child { margin-bottom: 0; }
+        
+        .info-label {
+            font-weight: 600;
+            color: var(--text-muted);
+            width: 115px;
+            flex-shrink: 0;
+            padding-top: 2px;
+        }
+
+        .info-value { color: var(--text-main); font-weight: 500; flex: 1; padding-top: 2px; }
+        
+        .info-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #e0e7ff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        .info-link:hover { background: #c7d2fe; }
+        .info-link.empty { background: #f3f4f6; color: #9ca3af; pointer-events: none; }
+
+        /* Actions (Admin Only) */
+        .admin-controls {
+            display: none; /* Sembunyikan default untuk mode penonton */
+        }
+        .admin-controls.active {
+            display: block; /* Muncul jika mode admin aktif */
+        }
+
+        .action-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .move-action {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-muted);
+            background: #f8fafc;
+            padding: 8px 12px;
+            border-radius: 10px;
+            gap: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        select.custom-select {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--primary);
+            cursor: pointer;
+            outline: none;
+            max-width: 150px;
+        }
+
+        .btn-mini {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-edit { background: var(--warning); }
+        .btn-delete { background: var(--danger); }
+
+        .category-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .close-folder {
+            background: #e5e7eb;
+            color: #4b5563;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Modal / Popup Form */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 20px;
+            padding: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-content h3 { margin-top: 0; color: var(--text-main); font-size: 18px; margin-bottom: 15px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--text-muted); }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); outline: none; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-actions button {
+            flex: 1; padding: 12px; border: none; border-radius: 10px;
+            font-family: 'Poppins', sans-serif; font-weight: 600; cursor: pointer;
+        }
+        .btn-cancel { background: #e5e7eb; color: var(--text-main); }
+        .btn-save { background: var(--primary); color: white; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .container { padding: 15px; border-radius: 16px; }
+            .info-label { width: 95px; font-size: 12px; }
+            .info-value, .info-link { font-size: 12px; }
+            .song-badge-detail { font-size: 10px; padding: 3px 6px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-bar">
+        <h2 class="header-title">🎧 Setlist Pro</h2>
+        <!-- Tombol Status Mode: Klik untuk login Admin -->
+        <button id="modeBtn" class="mode-badge mode-viewer" onclick="toggleAdminMode()">👁️ Penonton</button>
+    </div>
+    
+    <!-- Tombol Tambah Lagu (Hanya muncul jika mode Admin aktif) -->
+    <button id="addGlobalBtn" class="btn-add-global admin-controls" onclick="openModal()">➕ Tambah Lagu Baru</button>
+
+    <!-- ==================== MAIN PLAYLIST ==================== -->
+    <div class="main-btn" onclick="togglePlaylist()">
+        <span>🎵 Playlist Lagu Tiponk</span>
+        <span id="icon-Playlist">▲</span>
+    </div>
+    
+    <div id="container-Playlist" class="playlist-container">
+        <div class="search-local">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-Input" oninput="searchLagu(this.value)" placeholder="Cari lagu di playlist...">
+        </div>
+        
+        <!-- 4 Kotak Kategori -->
+        <div class="folders-grid">
+            <div class="sub-btn btn-pop-indo" onclick="openFolder('PopIndo')">
+                <span class="folder-icon">🎸</span><span>Pop Indo</span>
+            </div>
+            <div class="sub-btn btn-pop-inggris" onclick="openFolder('PopInggris')">
+                <span class="folder-icon">🎧</span><span style="color: #0891b2;">Pop Inggris</span>
+            </div>
+            <div class="sub-btn btn-ambyar" onclick="openFolder('Ambyar')">
+                <span class="folder-icon">💔</span><span style="color: #be185d;">Ambyar</span>
+            </div>
+            <div class="sub-btn btn-lawas" onclick="openFolder('Lawas')">
+                <span class="folder-icon">📻</span><span style="color: #b45309;">Lawas</span>
+            </div>
+        </div>
+
+        <!-- Area Konten (4 Folder) -->
+        <div id="content-PopIndo" class="sub-content">
+            <div class="category-header">
+                <span>Daftar Lagu Pop Indo</span>
+                <button class="close-folder" onclick="closeFolder('PopIndo')">Tutup ✖</button>
+            </div>
+            <ul id="list-PopIndo"></ul>
+        </div>
+
+        <div id="content-PopInggris" class="sub-content">
+            <div class="category-header" style="color: #0891b2;">
+                <span>Daftar Lagu Pop Inggris</span>
+                <button class="close-folder" onclick="closeFolder('PopInggris')">Tutup ✖</button>
+            </div>
+            <ul id="list-PopInggris"></ul>
+        </div>
+
+        <div id="content-Ambyar" class="sub-content">
+            <div class="category-header" style="color: #be185d;">
+                <span>Daftar Lagu Ambyar</span>
+                <button class="close-folder" onclick="closeFolder('Ambyar')">Tutup ✖</button>
+            </div>
+            <ul id="list-Ambyar"></ul>
+        </div>
+
+        <div id="content-Lawas" class="sub-content">
+            <div class="category-header" style="color: #b45309;">
+                <span>Daftar Lagu Lawas</span>
+                <button class="close-folder" onclick="closeFolder('Lawas')">Tutup ✖</button>
+            </div>
+            <ul id="list-Lawas"></ul>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah/Edit -->
+<div id="songModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 id="modalTitle">Tambah Lagu Baru</h3>
+        <form id="songForm" onsubmit="saveSong(event)">
+            <input type="hidden" id="editIndex" value="-1">
+            
+            <div class="form-group">
+                <label>Kategori Genre</label>
+                <select id="inputCategory" required>
+                    <option value="PopIndo">Pop Indo</option>
+                    <option value="PopInggris">Pop Inggris</option>
+                    <option value="Ambyar">Ambyar 💔</option>
+                    <option value="Lawas">Lawas 📻</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Judul Lagu</label>
+                <input type="text" id="inputTitle" placeholder="Contoh: Mahalini - Bohongi Hati" required>
+            </div>
+            <div class="form-group">
+                <label>🎸 Chord Asli (Original)</label>
+                <input type="text" id="inputChordAsli" placeholder="Contoh: D#">
+            </div>
+            <div class="form-group">
+                <label>🧑 Chord Cowok</label>
+                <input type="text" id="inputChordCowok" placeholder="Contoh: E">
+            </div>
+            <div class="form-group">
+                <label>👩 Chord Cewek</label>
+                <input type="text" id="inputChordCewek" placeholder="Contoh: A">
+            </div>
+            <div class="form-group">
+                <label>📝 Catatan / Modulasi (Opsional)</label>
+                <input type="text" id="inputCatatan" placeholder="Contoh: Overtune ke F di akhir">
+            </div>
+            <div class="form-group">
+                <label>🔗 Link Situs Chord (Opsional)</label>
+                <input type="url" id="inputLinkChord" placeholder="https://chordindonesia.com/...">
+            </div>
+            <div class="form-group">
+                <label>▶️ Link YouTube (Opsional)</label>
+                <input type="url" id="inputLinkYoutube" placeholder="https://youtube.com/...">
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
+                <button type="submit" class="btn-save">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const defaultData = [
+        // ================= POP INDO =================
+        { title: "Ada Titik Titik", chordAsli: "Bb", chordCowok: "", chordCewek: "", catatan: "Main di G", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Ade Govinda (feat. Fadly) - Hal Hebat", chordAsli: "D", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Aura Kasih - Mari Bercinta", chordAsli: "Cm", chordCowok: "", chordCewek: "", catatan: "Intro: Fm", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "BCL - Medley", chordAsli: "", chordCowok: "", chordCewek: "", catatan: "Sesuai aransemen", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Blackout - Selalu Ada", chordAsli: "E", chordCowok: "", chordCewek: "G", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Diskoria, Laleilmanino, Eva Celia - C.H.R.I.S.Y.E", chordAsli: "F", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "d'Masiv - Diam Tanpa Kata", chordAsli: "Bm", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "d'Masiv - Merindukanmu", chordAsli: "E", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Dygta - Tapi Tahukah Kamu", chordAsli: "C#", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Element - Cinta Tak Bersyarat", chordAsli: "C", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Element - Maaf Dari Surga", chordAsli: "D", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Ernie Zakri & Ade Govinda - Masing-Masing", chordAsli: "D#", chordCowok: "", chordCewek: "E", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Fatin Shidqia - Aku Memilih Setia", chordAsli: "G", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Geisha - Cinta Dan Benci", chordAsli: "F#", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Geisha - Takkan Pernah Ada", chordAsli: "D", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Glenn Fredly - Januari", chordAsli: "C", chordCowok: "", chordCewek: "", catatan: "Naik 1.5", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Jangan Paksa Rindu", chordAsli: "", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Juicy Luicy - Terlalu Tinggi", chordAsli: "E", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Kerispatih - Bila Rasaku Ini Rasamu", chordAsli: "F", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Kerispatih - Tak Lekang Oleh Waktu", chordAsli: "D", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Lyodra - Teganya Kau", chordAsli: "F#", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Mahalini - Bohongi Hati", chordAsli: "D#", chordCowok: "", chordCewek: "E", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Mario G. Klau - Semata Karenamu", chordAsli: "G", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Nadhif Basalamah - Kota Ini Tak Sama Tanpamu", chordAsli: "A#", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Perunggu - 33x", chordAsli: "G", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Rossa - Hey Ladies", chordAsli: "Fm", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Rossa - Pudar", chordAsli: "G", chordCowok: "", chordCewek: "", catatan: "Int: Gm, Em", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Rossa - Terlalu Cinta", chordAsli: "G#", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Sesi Potret", chordAsli: "", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Shaggydog - Kembali Berdansa", chordAsli: "C", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Sherina - Cinta Pertama Dan Terakhir", chordAsli: "A", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Souljah - Tak Selalu", chordAsli: "G", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Steven & Coconut Treez - Welcome To My Paradise", chordAsli: "A", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Terbuang Dalam Waktu", chordAsli: "", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "The Lantis - Bunga Maaf", chordAsli: "A", chordCowok: "", chordCewek: "D", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Utopia - Baby Doll", chordAsli: "G", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Utopia - Hujan", chordAsli: "G", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Wijaya80 - Terakhir Kali", chordAsli: "G", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Yovie & Nuno - Merindu Lagi", chordAsli: "D", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Yovie & Nuno - Tanpa Cinta", chordAsli: "D", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+        { title: "Yovie & Nuno - Tanpa Cinta (Versi G)", chordAsli: "G", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopIndo" },
+
+        // ================= POP INGGRIS =================
+        { title: "ABBA - Dancing Queen", chordAsli: "A", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Adele - Don't You Remember", chordAsli: "D#", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Bon Jovi - Always", chordAsli: "E", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Bon Jovi - Thank You For Loving Me", chordAsli: "D", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Bruno Mars - It Will Rain", chordAsli: "D", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Bruno Mars - Risk It All", chordAsli: "D", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Bruno Mars - Talking To The Moon", chordAsli: "E", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Bruno Mars - The Lazy Song", chordAsli: "B", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Coldplay / Maroon 5 - Fix You", chordAsli: "D#", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Coldplay - Yellow", chordAsli: "B", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Daniel Caesar feat. H.E.R. - Best Part", chordAsli: "D", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Jessie J - Flashlight", chordAsli: "F", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Jessie J - Price Tag", chordAsli: "F", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Justin Bieber - Favorite Girl", chordAsli: "G", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Keane - Everybody's Changing", chordAsli: "C", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Lady Gaga - Remember Us This Way", chordAsli: "C", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Lady Gaga & Bruno Mars - Die With A Smile", chordAsli: "A", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+        { title: "Sam Smith - I'm Not The Only One", chordAsli: "F", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "PopInggris" },
+
+        // ================= LAWAS =================
+        { title: "Chrisye - Kala Cinta Menggoda", chordAsli: "Cm", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "Lawas" },
+        { title: "Dewa 19 - Aku Milikmu", chordAsli: "E", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "Lawas" },
+        { title: "Dewa 19 - Tak Kan Ada Cinta Yang Lain", chordAsli: "Am", chordCowok: "", chordCewek: "C#m", catatan: "", linkChord: "", linkYoutube: "", category: "Lawas" },
+        { title: "Dian Piesesha - Tak Ingin Sendiri", chordAsli: "A", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "Lawas" },
+        { title: "M.E - Inikah Cinta", chordAsli: "A", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "Lawas" },
+        { title: "Ruth Sahanaya - Kaulah Segalanya", chordAsli: "E", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "Lawas" },
+        { title: "Utha Likumahuwa - Sesaat Kau Hadir", chordAsli: "G", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "Lawas" },
+
+        // ================= AMBYAR =================
+        { title: "Duda Araban", chordAsli: "G#m", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "Ambyar" },
+        { title: "Rungkad", chordAsli: "F", chordCowok: "", chordCewek: "", catatan: "", linkChord: "", linkYoutube: "", category: "Ambyar" }
+    ];
+
+    const folderKeys = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas'];
+    let isAdmin = false; // Status awal sebagai penonton (viewer)
+
+    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v9'));
+    if (!daftarLagu || daftarLagu.length === 0) { 
+        daftarLagu = defaultData;
+    }
+
+    // Fungsi Login/Logout Admin Sederhana pakai Password
+    function toggleAdminMode() {
+        if (!isAdmin) {
+            let pass = prompt("Masukkan Password Admin:");
+            if (pass === "tiponk123") { // <-- Ganti password di sini kalau mau
+                isAdmin = true;
+                alert("Berhasil masuk sebagai Admin!");
+            } else if (pass !== null) {
+                alert("Password salah!");
+                return;
+            } else {
+                return;
+            }
+        } else {
+            isAdmin = false;
+            alert("Keluar dari Mode Admin (Kembali jadi Penonton)");
+        }
+        updateAdminUI();
+    }
+
+    function updateAdminUI() {
+        const modeBtn = document.getElementById('modeBtn');
+        const adminControls = document.querySelectorAll('.admin-controls');
+
+        if (isAdmin) {
+            modeBtn.innerText = "👑 Admin";
+            modeBtn.className = "mode-badge mode-admin";
+            adminControls.forEach(el => el.classList.add('active'));
+        } else {
+            modeBtn.innerText = "👁️ Penonton";
+            modeBtn.className = "mode-badge mode-viewer";
+            adminControls.forEach(el => el.classList.remove('active'));
+        }
+        renderSongs();
+    }
+
+    function togglePlaylist() {
+        const container = document.getElementById(`container-Playlist`);
+        const icon = document.getElementById(`icon-Playlist`);
+        
+        if (container.style.display === "none" || container.style.display === "") {
+            container.style.display = "block";
+            icon.innerText = "▲";
+        } else {
+            container.style.display = "none";
+            icon.innerText = "▼";
+            folderKeys.forEach(closeFolder);
+            document.getElementById('search-Input').value = "";
+            searchLagu("");
+        }
+    }
+
+    function openFolder(targetCategory) {
+        folderKeys.forEach(cat => closeFolder(cat));
+        document.getElementById(`content-${targetCategory}`).style.display = 'block';
+    }
+
+    function closeFolder(category) {
+        document.getElementById(`content-${category}`).style.display = 'none';
+    }
+
+    function renderSongs() {
+        folderKeys.forEach(cat => {
+            document.getElementById(`list-${cat}`).innerHTML = '';
+        });
+
+        daftarLagu.forEach((lagu, index) => {
+            const li = document.createElement('li');
+            li.className = 'song-item';
+            li.setAttribute('data-category', lagu.category);
+            
+            const btnChordClass = lagu.linkChord ? "info-link" : "info-link empty";
+            const btnChordText = lagu.linkChord ? "Buka Web 🔗" : "Kosong";
+            
+            const btnYtClass = lagu.linkYoutube ? "info-link" : "info-link empty";
+            const btnYtText = lagu.linkYoutube ? "Tonton ▶️" : "Kosong";
+
+            // Tampilkan tombol edit/hapus dan opsi pindah folder HANYA jika sedang mode Admin
+            let adminActionHtml = '';
+            if (isAdmin) {
+                adminActionHtml = `
+                    <div class="action-group">
+                        <button class="btn-mini btn-edit" onclick="openModal(${index})">✏️ Edit</button>
+                        <button class="btn-mini btn-delete" onclick="hapusLagu(${index})">🗑️ Hapus</button>
+                    </div>
+
+                    <div class="move-action">
+                        <span>Pindah Folder:</span>
+                        <select class="custom-select" onchange="pindahKategori(${index}, this.value)">
+                            <option value="PopIndo" ${lagu.category === 'PopIndo' ? 'selected' : ''}>Pop Indo</option>
+                            <option value="PopInggris" ${lagu.category === 'PopInggris' ? 'selected' : ''}>Pop Inggris</option>
+                            <option value="Ambyar" ${lagu.category === 'Ambyar' ? 'selected' : ''}>Ambyar 💔</option>
+                            <option value="Lawas" ${lagu.category === 'Lawas' ? 'selected' : ''}>Lawas 📻</option>
+                        </select>
+                    </div>
+                `;
+            }
+
+            li.innerHTML = `
+                <div class="song-title-row" onclick="toggleDetails(this)">
+                    <span class="song-title">${lagu.title}</span>
+                    <span class="song-badge-detail">Lihat Detail 📌</span>
+                    <span class="music-icon">🎵</span>
+                </div>
+                
+                <div class="song-details">
+                    <div class="info-box">
+                        <div class="info-row">
+                            <span class="info-label">🎸 Chord Asli</span>
+                            <span class="info-value">: ${lagu.chordAsli || "-"}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">🧑 Chord Cowok</span>
+                            <span class="info-value">: ${lagu.chordCowok || "-"}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">👩 Chord Cewek</span>
+                            <span class="info-value">: ${lagu.chordCewek || "-"}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">📝 Catatan</span>
+                            <span class="info-value">: ${lagu.catatan || "-"}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">🌐 Web Chord</span>
+                            <span class="info-value">: <a href="${lagu.linkChord || '#'}" target="_blank" class="${btnChordClass}">${btnChordText}</a></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">📺 YouTube</span>
+                            <span class="info-value">: <a href="${lagu.linkYoutube || '#'}" target="_blank" class="${btnYtClass}">${btnYtText}</a></span>
+                        </div>
+                    </div>
+                    
+                    ${adminActionHtml}
+                </div>
+            `;
+            
+            const targetList = document.getElementById(`list-${lagu.category}`);
+            if(targetList) { targetList.appendChild(li); }
+        });
+        
+        localStorage.setItem('setlistTiponkData_v9', JSON.stringify(daftarLagu));
+    }
+
+    function toggleDetails(element) {
+        const details = element.nextElementSibling;
+        details.style.display = (details.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function pindahKategori(index, newCategory) {
+        if (!isAdmin) return;
+        daftarLagu[index].category = newCategory;
+        renderSongs();
+        openFolder(newCategory);
+    }
+
+    function searchLagu(filter) {
+        filter = filter.toLowerCase();
+        const container = document.getElementById('container-Playlist');
+        const items = container.getElementsByClassName('song-item');
+
+        let foundCategories = {
+            PopIndo: false,
+            PopInggris: false,
+            Ambyar: false,
+            Lawas: false
+        };
+
+        for (let i = 0; i < items.length; i++) {
+            let title = items[i].querySelector('.song-title').innerText.toLowerCase();
+            let category = items[i].getAttribute('data-category');
+            
+            if (title.includes(filter)) {
+                items[i].style.display = "";
+                if(foundCategories[category] !== undefined) {
+                    foundCategories[category] = true;
+                }
+            } else {
+                items[i].style.display = "none";
+            }
+        }
+
+        if (filter.length > 0) {
+            folderKeys.forEach(cat => {
+                document.getElementById(`content-${cat}`).style.display = foundCategories[cat] ? 'block' : 'none';
+            });
+        } else {
+            folderKeys.forEach(closeFolder);
+        }
+    }
+
+    function openModal(index = -1) {
+        if (!isAdmin) return;
+        document.getElementById('songModal').style.display = 'flex';
+        const isEdit = index >= 0;
+        
+        document.getElementById('modalTitle').innerText = isEdit ? "Edit Lagu" : "Tambah Lagu Baru";
+        document.getElementById('editIndex').value = index;
+
+        if(isEdit) {
+            const lagu = daftarLagu[index];
+            document.getElementById('inputCategory').value = lagu.category;
+            document.getElementById('inputTitle').value = lagu.title;
+            document.getElementById('inputChordAsli').value = lagu.chordAsli || "";
+            document.getElementById('inputChordCowok').value = lagu.chordCowok || "";
+            document.getElementById('inputChordCewek').value = lagu.chordCewek || "";
+            document.getElementById('inputCatatan').value = lagu.catatan || "";
+            document.getElementById('inputLinkChord').value = lagu.linkChord || "";
+            document.getElementById('inputLinkYoutube').value = lagu.linkYoutube || "";
+        } else {
+            document.getElementById('songForm').reset();
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('songModal').style.display = 'none';
+    }
+
+    function saveSong(event) {
+        event.preventDefault(); 
+        if (!isAdmin) return;
+        
+        const index = parseInt(document.getElementById('editIndex').value);
+        const category = document.getElementById('inputCategory').value;
+        const title = document.getElementById('inputTitle').value.trim();
+        const chordAsli = document.getElementById('inputChordAsli').value;
+        const chordCowok = document.getElementById('inputChordCowok').value;
+        const chordCewek = document.getElementById('inputChordCewek').value;
+        const catatan = document.getElementById('inputCatatan').value;
+        const linkChord = document.getElementById('inputLinkChord').value;
+        const linkYoutube = document.getElementById('inputLinkYoutube').value;
+
+        // Cek Lagu Duplikat
+        const isDuplicate = daftarLagu.some((lagu, idx) => {
+            return lagu.title.toLowerCase() === title.toLowerCase() && idx !== index;
+        });
+
+        if (isDuplicate) {
+            alert("Lagu yang Anda tambahkan sudah ada di dalam setlist!");
+            return;
+        }
+
+        const newSong = { title, chordAsli, chordCowok, chordCewek, catatan, linkChord, linkYoutube, category };
+
+        if (index >= 0) {
+            daftarLagu[index] = newSong;
+        } else {
+            daftarLagu.push(newSong);
+        }
+
+        renderSongs();
+        closeModal();
+        
+        document.getElementById(`container-Playlist`).style.display = 'block';
+        document.getElementById(`icon-Playlist`).innerText = "▲";
+        openFolder(category);
+    }
+
+    function hapusLagu(index) {
+        if (!isAdmin) return;
+        if(confirm("Apakah kamu yakin ingin menghapus lagu ini dari setlist?")) {
+            daftarLagu.splice(index, 1);
+            renderSongs();
+        }
+    }
+
+    renderSongs();
+</script>
+
+</body>
+</html>
