@@ -554,7 +554,7 @@
             </div>
         </div>
 
-        <!-- AREA FOLDER HASIL PASTE SESI MANGGUNG (+ TOMBOL KIRIM WA & SALIN TEKS) -->
+        <!-- AREA FOLDER HASIL PASTE SESI MANGGUNG -->
         <div id="content-SesiManggung" class="sub-content">
             <div class="category-header" style="color:#8b5cf6;">
                 <span>📋 SETLIST MANGGUNG (SESI)</span>
@@ -904,7 +904,7 @@
     const folderKeys = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas'];
     let isAdmin = false;
 
-    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v24'));
+    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v25'));
     if (!daftarLagu || daftarLagu.length === 0) { 
         daftarLagu = defaultData;
     }
@@ -1111,7 +1111,7 @@
             if(targetList) { targetList.appendChild(li); }
         });
         
-        localStorage.setItem('setlistTiponkData_v24', JSON.stringify(daftarLagu));
+        localStorage.setItem('setlistTiponkData_v25', JSON.stringify(daftarLagu));
     }
 
     function toggleDetails(element) {
@@ -1599,7 +1599,8 @@
         const listContainer = document.getElementById('list-SesiManggung');
         if (!listContainer || listContainer.children.length === 0) return "";
 
-        let result = "🎸 *SETLIST MANGGUNG TIPONG*\n\n";
+        // JUDUL DISESUAIKAN MENJADI "SETLIST MANGGUNG"
+        let result = "SETLIST MANGGUNG\n\n";
         let children = Array.from(listContainer.children);
         let songIndex = 1;
 
