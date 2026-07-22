@@ -135,6 +135,9 @@
         .btn-import-theme { background: var(--success); color: white; }
         .btn-paste-theme { background: #8b5cf6; color: white; width: 100%; margin-top: -4px; }
         .btn-backup-theme { background: var(--info); color: white; }
+        .btn-generate-theme { background: #f59e0b; color: white; width: 100%; margin-top: -4px; display: none; }
+
+        .admin-controls.active { display: flex !important; }
 
         /* Main Folder Button */
         .main-btn {
@@ -552,6 +555,7 @@
         <button class="btn-action-main btn-add-theme" onclick="openModal()">➕ Tambah Lagu</button>
         <button class="btn-action-main btn-import-theme" onclick="openImportModal()">📄 Import .txt</button>
         <button class="btn-action-main btn-backup-theme" onclick="openBackupModal()">💾 Backup/Restore</button>
+        <button class="btn-action-main btn-generate-theme admin-controls" onclick="generateUpdatedIndexHtml()">⚙️ Generate index.html (Update GitHub)</button>
         <button class="btn-action-main btn-paste-theme" onclick="openPasteModal()">📋 Paste Setlist Sesi Manggung</button>
     </div>
 
@@ -962,7 +966,8 @@
     const folderKeys = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas'];
     let isAdmin = false;
 
-    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v26'));
+    let currentVerNum = parseInt(localStorage.getItem('setlistVerNumVal')) || 26;
+    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v' + currentVerNum));
     if (!daftarLagu || daftarLagu.length === 0) { 
         daftarLagu = defaultData;
     }
@@ -975,7 +980,6 @@
         document.querySelector('.btn-theme-toggle').innerText = isDark ? '☀️' : '🌙';
     }
 
-    // Load Dark Mode Preference
     if (localStorage.getItem('setlistDarkMode') === 'enabled') {
         document.body.classList.add('dark-mode');
         document.querySelector('.btn-theme-toggle').innerText = '☀️';
@@ -1046,7 +1050,7 @@
 
     function updateAdminUI() {
         const modeBtn = document.getElementById('modeBtn');
-        const adminControls = document.querySelectorAll('.admin-inline-controls');
+        const adminControls = document.querySelectorAll('.admin-controls');
 
         if (isAdmin) {
             modeBtn.innerText = "👑 Admin";
@@ -1183,7 +1187,8 @@
             if(targetList) { targetList.appendChild(li); }
         });
         
-        localStorage.setItem('setlistTiponkData_v26', JSON.stringify(daftarLagu));
+        localStorage.setItem('setlistVerNumVal', currentVerNum);
+        localStorage.setItem('setlistTiponkData_v' + currentVerNum, JSON.stringify(daftarLagu));
     }
 
     function toggleDetails(element) {
@@ -1406,6 +1411,38 @@
         };
 
         reader.readAsText(file);
+    }
+
+    // ================= FITUR GENERATE INDEX.HTML UTUK GITHUB =================
+    function generateUpdatedIndexHtml() {
+        if (!isAdmin) {
+            showCustomAlert("Akses Terkunci", "Harus login Admin untuk generate file index.html!", "🔒");
+            return;
+        }
+
+        let nextVerNum = currentVerNum + 1;
+        let htmlSource = document.documentElement.outerHTML;
+
+        // Injeksi data lagu terbaru ke variabel defaultData
+        let formattedData = "const defaultData = " + JSON.stringify(daftarLagu, null, 8) + ";";
+        htmlSource = htmlSource.replace(/const defaultData = \[[\s\S]*?\];/m, formattedData);
+
+        // Update nomor versi otomatis
+        let verRegex1 = new RegExp('let currentVerNum = parseInt\\(localStorage\\.getItem\\(\\'setlistVerNumVal\\'\\)\\) \\|\\| ' + currentVerNum + ';', 'g');
+        htmlSource = htmlSource.replace(verRegex1, 'let currentVerNum = parseInt(localStorage.getItem(\'setlistVerNumVal\')) || ' + nextVerNum + ';');
+
+        let fullCode = "<!DOCTYPE html>\n<html lang=\"id\">\n" + htmlSource.substring(htmlSource.indexOf('<head>'));
+
+        // Download otomatis
+        const blob = new Blob([fullCode], { type: "text/html;charset=utf-8" });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = "index.html";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        showCustomAlert("Generate Berhasil!", `File index.html versi v${nextVerNum} berhasil didownload! Tinggal upload/replace file ini di GitHub kamu.`, "⚙️");
     }
 
     // ================= FITUR BACKUP & RESTORE DATA JSON =================
