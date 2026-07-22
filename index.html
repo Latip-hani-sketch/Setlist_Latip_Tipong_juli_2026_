@@ -247,6 +247,7 @@
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
+            gap: 8px;
         }
         
         .song-title {
@@ -254,6 +255,17 @@
             font-weight: 500;
             color: var(--text-main);
             flex: 1;
+        }
+
+        /* Inline Input saat Edit di Kolom */
+        .inline-edit-input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1.5px solid var(--primary);
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            outline: none;
         }
 
         .song-badge-detail {
@@ -389,13 +401,14 @@
             display: flex;
             gap: 4px;
             margin-left: 8px;
+            flex-shrink: 0;
         }
         .btn-sesi-mini {
             border: none;
             background: #f3f4f6;
             color: #374151;
-            padding: 3px 6px;
-            border-radius: 5px;
+            padding: 4px 8px;
+            border-radius: 6px;
             font-size: 11px;
             cursor: pointer;
             font-weight: 600;
@@ -782,7 +795,7 @@
     const folderKeys = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas'];
     let isAdmin = false;
 
-    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v19'));
+    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v20'));
     if (!daftarLagu || daftarLagu.length === 0) { 
         daftarLagu = defaultData;
     }
@@ -945,7 +958,7 @@
             if(targetList) { targetList.appendChild(li); }
         });
         
-        localStorage.setItem('setlistTiponkData_v19', JSON.stringify(daftarLagu));
+        localStorage.setItem('setlistTiponkData_v20', JSON.stringify(daftarLagu));
     }
 
     function toggleDetails(element) {
@@ -1173,7 +1186,7 @@
     function openPasteModal() {
         document.getElementById('pasteModal').style.display = 'flex';
         document.getElementById('pasteTextArea').value = '';
-        switchPasteTab(1); // Default ke Tab 1
+        switchPasteTab(1);
     }
 
     function closePasteModal() {
@@ -1256,7 +1269,7 @@
                     <div class="song-title-row">
                         <span class="song-title" onclick="toggleDetails(this)">📌 ${rawLine} <small style="color:var(--success); font-weight:600;">(Ada di DB)</small></span>
                         <div class="session-item-actions">
-                            <button class="btn-sesi-mini" onclick="editSessionTitle(this)">✏️</button>
+                            <button class="btn-sesi-mini" onclick="enableInlineEdit(this)">✏️</button>
                             <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
                         </div>
                     </div>
@@ -1276,7 +1289,7 @@
                     <div class="song-title-row">
                         <span class="song-title">${rawLine} <small style="color:var(--danger); font-weight:500;">(Belum Ada Chord)</small></span>
                         <div class="session-item-actions">
-                            <button class="btn-sesi-mini" onclick="editSessionTitle(this)">✏️</button>
+                            <button class="btn-sesi-mini" onclick="enableInlineEdit(this)">✏️</button>
                             <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
                         </div>
                     </div>
@@ -1296,7 +1309,7 @@
     // TAB 2: BUAT TEMPLATE TABEL KOSONG (SESI 1, SESI 2, OPTIONAL)
     function generateEmptyTemplateSesi() {
         const listContainer = document.getElementById('list-SesiManggung');
-        listContainer.innerHTML = ''; // Reset container
+        listContainer.innerHTML = '';
 
         const defaultSessions = ["SESI 1", "SESI 2", "OPTIONAL"];
 
@@ -1311,14 +1324,13 @@
 
             const ul = document.createElement('ul');
             
-            // Masukkan 1 slot kosong default per sesi
             const li = document.createElement('li');
             li.className = 'song-item';
             li.innerHTML = `
                 <div class="song-title-row">
                     <span class="song-title">📌 (Klik ✏️ untuk isi nama lagu)</span>
                     <div class="session-item-actions">
-                        <button class="btn-sesi-mini" onclick="editSessionTitle(this)">✏️</button>
+                        <button class="btn-sesi-mini" onclick="enableInlineEdit(this)">✏️</button>
                         <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
                     </div>
                 </div>
@@ -1331,7 +1343,7 @@
         openFolder('SesiManggung');
     }
 
-    // Tambah Kolom/Baris Baru di Sesi Terkait
+    // Tambah Baris Baru di Sesi
     function addEmptySlotToUl(btnEl) {
         const headerDiv = btnEl.parentNode;
         let ul = headerDiv.nextElementSibling;
@@ -1341,17 +1353,66 @@
             headerDiv.after(ul);
         }
 
-        let newTitle = prompt("Masukkan Judul Lagu untuk Sesi Ini:");
-        if (newTitle === null) return; // Jika batal
-        
-        let displayTitle = newTitle.trim() !== '' ? newTitle.trim() : "(Klik ✏️ untuk isi nama lagu)";
-
-        // Cek ke DB untuk pencocokan otomatis saat ketik manual
-        let searchKey = displayTitle.toLowerCase().replace(/\(.*?\)/g, '').trim();
-        let foundSong = daftarLagu.find(l => l.title.toLowerCase().includes(searchKey));
-
         const li = document.createElement('li');
         li.className = 'song-item';
+        li.innerHTML = `
+            <div class="song-title-row">
+                <input type="text" class="inline-edit-input" placeholder="Ketik nama lagu di sini..." autofocus>
+                <div class="session-item-actions">
+                    <button class="btn-sesi-mini" style="color:var(--success);" onclick="saveInlineEdit(this)">✔️</button>
+                    <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
+                </div>
+            </div>
+        `;
+        ul.appendChild(li);
+
+        // Fokuskan kursor ke input yang baru dibuat
+        const inputEl = li.querySelector('.inline-edit-input');
+        if(inputEl) inputEl.focus();
+    }
+
+    // ================= EDIT INLINE LANGSUNG DI KOLOM =================
+    function enableInlineEdit(btnEl) {
+        const titleRow = btnEl.closest('.song-title-row');
+        const titleSpan = titleRow.querySelector('.song-title');
+        
+        // Ambil teks murni tanpa emblem badge
+        let oldText = titleSpan.innerText.replace(/📌|\(Ada di DB\)|\(Belum Ada Chord\)|\(Klik ✏️ untuk isi nama lagu\)/g, '').trim();
+
+        titleRow.innerHTML = `
+            <input type="text" class="inline-edit-input" value="${oldText}" autofocus>
+            <div class="session-item-actions">
+                <button class="btn-sesi-mini" style="color:var(--success);" onclick="saveInlineEdit(this)">✔️</button>
+                <button class="btn-sesi-mini" style="color:var(--danger);" onclick="cancelInlineEdit(this, '${oldText}')">✖️</button>
+            </div>
+        `;
+
+        const inputEl = titleRow.querySelector('.inline-edit-input');
+        inputEl.focus();
+        inputEl.select();
+
+        // Mengizinkan pencetan tombol Enter di keyboard untuk menyimpan
+        inputEl.addEventListener('keyup', function(e) {
+            if(e.key === 'Enter') {
+                saveInlineEdit(titleRow.querySelector('.btn-sesi-mini'));
+            }
+        });
+    }
+
+    // Simpan Perubahan Input Kolom
+    function saveInlineEdit(btnEl) {
+        const titleRow = btnEl.closest('.song-title-row');
+        const inputEl = titleRow.querySelector('.inline-edit-input');
+        let newTitle = inputEl.value.trim();
+
+        if(newTitle === '') {
+            newTitle = "(Lagu Kosong)";
+        }
+
+        // Cek ke DB jika ada pencocokan lagu
+        let searchKey = newTitle.toLowerCase().replace(/\(.*?\)/g, '').trim();
+        let foundSong = daftarLagu.find(l => l.title.toLowerCase().includes(searchKey));
+        const liItem = titleRow.closest('li.song-item');
 
         if(foundSong && searchKey.length > 2) {
             const btnChordClass = foundSong.linkChord ? "info-link" : "info-link empty";
@@ -1359,11 +1420,11 @@
             const btnYtClass = foundSong.linkYoutube ? "info-link" : "info-link empty";
             const btnYtText = foundSong.linkYoutube ? "Tonton ▶️" : "Kosong";
 
-            li.innerHTML = `
+            liItem.innerHTML = `
                 <div class="song-title-row">
-                    <span class="song-title" onclick="toggleDetails(this)">📌 ${displayTitle} <small style="color:var(--success); font-weight:600;">(Ada di DB)</small></span>
+                    <span class="song-title" onclick="toggleDetails(this)">📌 ${newTitle} <small style="color:var(--success); font-weight:600;">(Ada di DB)</small></span>
                     <div class="session-item-actions">
-                        <button class="btn-sesi-mini" onclick="editSessionTitle(this)">✏️</button>
+                        <button class="btn-sesi-mini" onclick="enableInlineEdit(this)">✏️</button>
                         <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
                     </div>
                 </div>
@@ -1379,35 +1440,26 @@
                 </div>
             `;
         } else {
-            li.innerHTML = `
-                <div class="song-title-row">
-                    <span class="song-title">📌 ${displayTitle}</span>
-                    <div class="session-item-actions">
-                        <button class="btn-sesi-mini" onclick="editSessionTitle(this)">✏️</button>
-                        <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
-                    </div>
+            titleRow.innerHTML = `
+                <span class="song-title">📌 ${newTitle}</span>
+                <div class="session-item-actions">
+                    <button class="btn-sesi-mini" onclick="enableInlineEdit(this)">✏️</button>
+                    <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
                 </div>
             `;
         }
-        ul.appendChild(li);
     }
 
-    // Edit Judul Lagu / Slot Sesi
-    function editSessionTitle(btnEl) {
-        const titleSpan = btnEl.closest('.song-title-row').querySelector('.song-title');
-        let oldText = titleSpan.innerText.replace(/📌|\(Ada di DB\)|\(Belum Ada Chord\)|\(Klik ✏️ untuk isi nama lagu\)/g, '').trim();
-        
-        let newTitle = prompt("Edit Nama Lagu / Catatan Sesi:", oldText);
-        if(newTitle !== null && newTitle.trim() !== '') {
-            let searchKey = newTitle.trim().toLowerCase();
-            let foundSong = daftarLagu.find(l => l.title.toLowerCase().includes(searchKey));
-            
-            if(foundSong && searchKey.length > 2) {
-                titleSpan.innerHTML = `📌 ${newTitle.trim()} <small style="color:var(--success); font-weight:600;">(Ada di DB)</small>`;
-            } else {
-                titleSpan.innerHTML = `📌 ${newTitle.trim()}`;
-            }
-        }
+    // Batal Edit
+    function cancelInlineEdit(btnEl, oldText) {
+        const titleRow = btnEl.closest('.song-title-row');
+        titleRow.innerHTML = `
+            <span class="song-title">📌 ${oldText}</span>
+            <div class="session-item-actions">
+                <button class="btn-sesi-mini" onclick="enableInlineEdit(this)">✏️</button>
+                <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
+            </div>
+        `;
     }
 
     // Hapus Baris Lagu di Sesi
