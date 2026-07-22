@@ -634,7 +634,7 @@
     </div>
 </div>
 
-<!-- MODAL FORM EDIT KHUSUS SESI MANGGUNG -->
+<!-- MODAL FORM EDIT KHUSUS SESI MANGGUNG (+ BISA SIMPAN KE PLAYLIST UTAMA) -->
 <div id="editSessionModal" class="modal-overlay">
     <div class="modal-content">
         <h3>✏️ Edit Lagu & Chord Sesi</h3>
@@ -666,6 +666,23 @@
             <div class="form-group">
                 <label>▶️ Link YouTube</label>
                 <input type="url" id="editSesiLinkYoutube" placeholder="https://...">
+            </div>
+
+            <!-- OPSI BARU: SIMPAN PERMANEN KE PLAYLIST UTAMA -->
+            <div class="form-group" style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed var(--border-color);">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600; color:var(--primary);">
+                    <input type="checkbox" id="editSesiSaveToDb" onchange="toggleCategorySelectInSesiEdit(this.checked)">
+                    💾 Simpan sekalian ke Playlist Utama Tipong
+                </label>
+            </div>
+            <div class="form-group" id="groupSesiCategory" style="display:none;">
+                <label>Pilih Kategori Playlist Utama</label>
+                <select id="editSesiCategory">
+                    <option value="PopIndo">Pop Indo</option>
+                    <option value="PopInggris">Pop Inggris</option>
+                    <option value="Ambyar">Ambyar</option>
+                    <option value="Lawas">Lawas</option>
+                </select>
             </div>
             
             <div class="modal-actions">
@@ -826,7 +843,7 @@
     const folderKeys = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas'];
     let isAdmin = false;
 
-    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v21'));
+    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v22'));
     if (!daftarLagu || daftarLagu.length === 0) { 
         daftarLagu = defaultData;
     }
@@ -989,7 +1006,7 @@
             if(targetList) { targetList.appendChild(li); }
         });
         
-        localStorage.setItem('setlistTiponkData_v21', JSON.stringify(daftarLagu));
+        localStorage.setItem('setlistTiponkData_v22', JSON.stringify(daftarLagu));
     }
 
     function toggleDetails(element) {
@@ -1243,12 +1260,11 @@
         }
     }
 
-    // HELPER: BUAT ITEM LAGU UNTUK SESI MANGGUNG (LENGKAP DENGAN DETAIL)
+    // HELPER: BUAT ITEM LAGU UNTUK SESI MANGGUNG
     function buildSessionSongItem(rawLine, foundSong = null, customDetails = null) {
         const li = document.createElement('li');
         li.className = 'song-item';
 
-        // Ambil data detail jika ada
         const chordAsli = customDetails ? customDetails.chordAsli : (foundSong ? foundSong.chordAsli : "");
         const chordCowok = customDetails ? customDetails.chordCowok : (foundSong ? foundSong.chordCowok : "");
         const chordCewek = customDetails ? customDetails.chordCewek : (foundSong ? foundSong.chordCewek : "");
@@ -1308,7 +1324,7 @@
                 sessionHeader.className = 'session-title-header';
                 sessionHeader.innerHTML = `
                     <span>${rawLine}</span>
-                    <button class="btn-sesi-mini" onclick="addEmptySlotToUl(this)">➕ Tambah Lagu</button>
+                    <button class="btn-sesi-mini" onclick="addEmptySlotToUl(this)">➕ Tambah Kolom</button>
                 `;
                 listContainer.appendChild(sessionHeader);
 
@@ -1352,7 +1368,7 @@
             sessionHeader.className = 'session-title-header';
             sessionHeader.innerHTML = `
                 <span>${sessionName}</span>
-                <button class="btn-sesi-mini" onclick="addEmptySlotToUl(this)">➕ Tambah Lagu</button>
+                <button class="btn-sesi-mini" onclick="addEmptySlotToUl(this)">➕ Tambah Kolom</button>
             `;
             listContainer.appendChild(sessionHeader);
 
@@ -1366,7 +1382,7 @@
         openFolder('SesiManggung');
     }
 
-    // Tambah Baris Baru di Sesi
+    // Tambah Kolom/Baris Kosong Saja (Tanpa langsung memicu popup)
     function addEmptySlotToUl(btnEl) {
         const headerDiv = btnEl.parentNode;
         let ul = headerDiv.nextElementSibling;
@@ -1378,9 +1394,6 @@
 
         const li = buildSessionSongItem("(Klik ✏️ Edit untuk isi lagu)");
         ul.appendChild(li);
-        
-        // Langsung buka modal edit untuk slot baru
-        openEditSessionModal(li.querySelector('.btn-sesi-mini'));
     }
 
     // ================= EDIT FORM LENGKAP KHUSUS SESI =================
@@ -1389,11 +1402,9 @@
     function openEditSessionModal(btnEl) {
         currentEditingLi = btnEl.closest('li.song-item');
         
-        // Ambil data judul
         const titleSpan = currentEditingLi.querySelector('.song-title');
         let oldTitle = titleSpan.innerText.replace(/📌|\(Ada di DB\)|\(Belum Ada Chord\)|\(Klik ✏️ Edit untuk isi lagu\)/g, '').trim();
 
-        // Ambil data nilai chord dari info-box
         const valChordAsli = currentEditingLi.querySelector('.val-chord-asli').innerText.replace(':', '').trim();
         const valChordCowok = currentEditingLi.querySelector('.val-chord-cowok').innerText.replace(':', '').trim();
         const valChordCewek = currentEditingLi.querySelector('.val-chord-cewek').innerText.replace(':', '').trim();
@@ -1405,7 +1416,6 @@
         const ytAnchor = currentEditingLi.querySelector('.val-link-yt a');
         const valLinkYt = (ytAnchor && ytAnchor.getAttribute('href') !== '#') ? ytAnchor.getAttribute('href') : '';
 
-        // Masukkan ke form modal edit
         document.getElementById('editSesiTitle').value = oldTitle;
         document.getElementById('editSesiChordAsli').value = valChordAsli === '-' ? '' : valChordAsli;
         document.getElementById('editSesiChordCowok').value = valChordCowok === '-' ? '' : valChordCowok;
@@ -1414,7 +1424,15 @@
         document.getElementById('editSesiLinkChord').value = valLinkChord;
         document.getElementById('editSesiLinkYoutube').value = valLinkYt;
 
+        // Reset Pilihan Simpan DB
+        document.getElementById('editSesiSaveToDb').checked = false;
+        document.getElementById('groupSesiCategory').style.display = 'none';
+
         document.getElementById('editSessionModal').style.display = 'flex';
+    }
+
+    function toggleCategorySelectInSesiEdit(isChecked) {
+        document.getElementById('groupSesiCategory').style.display = isChecked ? 'block' : 'none';
     }
 
     function closeEditSessionModal() {
@@ -1434,7 +1452,31 @@
         const linkChord = document.getElementById('editSesiLinkChord').value.trim();
         const linkYoutube = document.getElementById('editSesiLinkYoutube').value.trim();
 
-        // Cek apakah judul baru cocok dengan lagu di DB
+        const saveToDb = document.getElementById('editSesiSaveToDb').checked;
+        const dbCategory = document.getElementById('editSesiCategory').value;
+
+        // SIMPAN PERMANEN KE DATABASE UTAMA (PLAYLIST TIPONG) JIKA DICENTANG
+        if (saveToDb && title.length > 1) {
+            const isExist = daftarLagu.some(l => l.title.toLowerCase() === title.toLowerCase());
+            if (!isExist) {
+                daftarLagu.push({
+                    title: title,
+                    chordAsli: chordAsli,
+                    chordCowok: chordCowok,
+                    chordCewek: chordCewek,
+                    catatan: catatan,
+                    linkChord: linkChord,
+                    linkYoutube: linkYoutube,
+                    category: dbCategory
+                });
+                renderSongs(); // Update tampilan Playlist Utama
+                alert(`✅ Lagu "${title}" berhasil dimasukkan ke Playlist Utama (${dbCategory})!`);
+            } else {
+                alert(`ℹ️ Lagu "${title}" sudah ada di Playlist Utama.`);
+            }
+        }
+
+        // Cek apakah judul cocok dengan lagu di DB
         let searchKey = title.toLowerCase().replace(/\(.*?\)/g, '').trim();
         let foundSong = daftarLagu.find(l => l.title.toLowerCase().includes(searchKey));
 
