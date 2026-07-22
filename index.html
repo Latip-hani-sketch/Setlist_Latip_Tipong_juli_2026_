@@ -137,6 +137,7 @@
         .btn-backup-theme { background: var(--info); color: white; }
         .btn-generate-theme { background: #f59e0b; color: white; width: 100%; margin-top: -4px; display: none; }
 
+        .admin-controls { display: none; }
         .admin-controls.active { display: flex !important; }
 
         /* Main Folder Button */
@@ -966,7 +967,7 @@
     const folderKeys = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas'];
     let isAdmin = false;
 
-    let currentVerNum = parseInt(localStorage.getItem('setlistVerNumVal')) || 26;
+    let currentVerNum = parseInt(localStorage.getItem('setlistVerNumVal')) || 27;
     let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v' + currentVerNum));
     if (!daftarLagu || daftarLagu.length === 0) { 
         daftarLagu = defaultData;
@@ -986,27 +987,26 @@
     }
 
     // ================= CUSTOM CENTER DIALOG SYSTEM =================
-    function showCustomAlert(title, message, icon = "ℹ️") {
+    function showCustomAlert(title, message, icon) {
+        if (!icon) icon = "ℹ️";
         document.getElementById('dialogIcon').innerText = icon;
         document.getElementById('dialogTitle').innerText = title;
         document.getElementById('dialogMessage').innerText = message;
         
         const actionsDiv = document.getElementById('dialogActions');
-        actionsDiv.innerHTML = `<button class="dialog-btn dialog-btn-primary" onclick="closeCustomDialog()">Oke</button>`;
+        actionsDiv.innerHTML = '<button class="dialog-btn dialog-btn-primary" onclick="closeCustomDialog()">Oke</button>';
         
         document.getElementById('customDialogOverlay').style.display = 'flex';
     }
 
-    function showCustomConfirm(title, message, onConfirm, icon = "⚠️") {
+    function showCustomConfirm(title, message, onConfirm, icon) {
+        if (!icon) icon = "⚠️";
         document.getElementById('dialogIcon').innerText = icon;
         document.getElementById('dialogTitle').innerText = title;
         document.getElementById('dialogMessage').innerText = message;
         
         const actionsDiv = document.getElementById('dialogActions');
-        actionsDiv.innerHTML = `
-            <button class="dialog-btn dialog-btn-cancel" onclick="closeCustomDialog()">Batal</button>
-            <button class="dialog-btn dialog-btn-danger" id="btnConfirmAction">Ya, Lanjutkan</button>
-        `;
+        actionsDiv.innerHTML = '<button class="dialog-btn dialog-btn-cancel" onclick="closeCustomDialog()">Batal</button><button class="dialog-btn dialog-btn-danger" id="btnConfirmAction">Ya, Lanjutkan</button>';
         
         document.getElementById('btnConfirmAction').onclick = function() {
             closeCustomDialog();
@@ -1055,18 +1055,18 @@
         if (isAdmin) {
             modeBtn.innerText = "👑 Admin";
             modeBtn.className = "mode-badge mode-admin";
-            adminControls.forEach(el => el.classList.add('active'));
+            adminControls.forEach(function(el) { el.classList.add('active'); });
         } else {
             modeBtn.innerText = "👁️ Penonton";
             modeBtn.className = "mode-badge mode-viewer";
-            adminControls.forEach(el => el.classList.remove('active'));
+            adminControls.forEach(function(el) { el.classList.remove('active'); });
         }
         renderSongs();
     }
 
     function togglePlaylist() {
-        const container = document.getElementById(`container-Playlist`);
-        const icon = document.getElementById(`icon-Playlist`);
+        const container = document.getElementById('container-Playlist');
+        const icon = document.getElementById('icon-Playlist');
         
         if (container.style.display === "none" || container.style.display === "") {
             container.style.display = "block";
@@ -1084,13 +1084,13 @@
         document.getElementById('folders-grid').style.display = 'none';
         document.getElementById('global-search-box').style.display = 'none';
         
-        const allCategories = [...folderKeys, 'SesiManggung'];
-        allCategories.forEach(cat => {
-            const el = document.getElementById(`content-${cat}`);
+        const allCategories = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas', 'SesiManggung'];
+        allCategories.forEach(function(cat) {
+            const el = document.getElementById('content-' + cat);
             if(el) {
                 el.style.display = (cat === targetCategory) ? 'block' : 'none';
             }
-            const searchInput = document.getElementById(`search-${cat}`);
+            const searchInput = document.getElementById('search-' + cat);
             if(searchInput) {
                 searchInput.value = "";
                 filterCategory(cat, "");
@@ -1101,19 +1101,19 @@
     function closeAllFolders() {
         document.getElementById('folders-grid').style.display = 'grid';
         document.getElementById('global-search-box').style.display = 'block';
-        const allCategories = [...folderKeys, 'SesiManggung'];
-        allCategories.forEach(cat => {
-            const el = document.getElementById(`content-${cat}`);
+        const allCategories = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas', 'SesiManggung'];
+        allCategories.forEach(function(cat) {
+            const el = document.getElementById('content-' + cat);
             if(el) el.style.display = 'none';
         });
     }
 
     function renderSongs() {
-        folderKeys.forEach(cat => {
-            document.getElementById(`list-${cat}`).innerHTML = '';
+        folderKeys.forEach(function(cat) {
+            document.getElementById('list-' + cat).innerHTML = '';
         });
 
-        daftarLagu.forEach((lagu, index) => {
+        daftarLagu.forEach(function(lagu, index) {
             const li = document.createElement('li');
             li.className = 'song-item';
             li.setAttribute('data-category', lagu.category);
@@ -1183,7 +1183,7 @@
                 </div>
             `;
             
-            const targetList = document.getElementById(`list-${lagu.category}`);
+            const targetList = document.getElementById('list-' + lagu.category);
             if(targetList) { targetList.appendChild(li); }
         });
         
@@ -1231,8 +1231,8 @@
 
         if (filter.length > 0) {
             foldersGrid.style.display = 'none';
-            folderKeys.forEach(cat => {
-                document.getElementById(`content-${cat}`).style.display = foundCategories[cat] ? 'block' : 'none';
+            folderKeys.forEach(function(cat) {
+                document.getElementById('content-' + cat).style.display = foundCategories[cat] ? 'block' : 'none';
             });
         } else {
             closeAllFolders();
@@ -1241,7 +1241,7 @@
 
     function filterCategory(categoryKey, filter) {
         filter = filter.toLowerCase();
-        const targetList = document.getElementById(`list-${categoryKey}`);
+        const targetList = document.getElementById('list-' + categoryKey);
         if(!targetList) return;
 
         const items = targetList.getElementsByClassName('song-item');
@@ -1255,7 +1255,8 @@
         }
     }
 
-    function openModal(index = -1) {
+    function openModal(index) {
+        if (typeof index === 'undefined') index = -1;
         if (!isAdmin) {
             showCustomAlert("Akses Terkunci", "Silakan login terlebih dahulu sebagai Admin untuk menambahkan lagu baru.", "🔒");
             return;
@@ -1299,7 +1300,7 @@
         const linkChord = document.getElementById('inputLinkChord').value;
         const linkYoutube = document.getElementById('inputLinkYoutube').value;
 
-        const isDuplicate = daftarLagu.some((lagu, idx) => {
+        const isDuplicate = daftarLagu.some(function(lagu, idx) {
             return lagu.title.toLowerCase() === title.toLowerCase() && idx !== index;
         });
 
@@ -1308,7 +1309,7 @@
             return;
         }
 
-        const newSong = { title, chordAsli, chordCowok, chordCewek, catatan, linkChord, linkYoutube, category };
+        const newSong = { title: title, chordAsli: chordAsli, chordCowok: chordCowok, chordCewek: chordCewek, catatan: catatan, linkChord: linkChord, linkYoutube: linkYoutube, category: category };
 
         if (index >= 0) {
             daftarLagu[index] = newSong;
@@ -1319,8 +1320,8 @@
         renderSongs();
         closeModal();
         
-        document.getElementById(`container-Playlist`).style.display = 'block';
-        document.getElementById(`icon-Playlist`).innerText = "▲";
+        document.getElementById('container-Playlist').style.display = 'block';
+        document.getElementById('icon-Playlist').innerText = "▲";
         openFolder(category);
     }
 
@@ -1366,7 +1367,7 @@
             let countAdded = 0;
             let countSkipped = 0;
 
-            lines.forEach(line => {
+            lines.forEach(function(line) {
                 let trimmedLine = line.trim();
                 trimmedLine = trimmedLine.replace(/^[\d+[\.\)\-]\s*/, '');
 
@@ -1381,12 +1382,12 @@
 
                 trimmedLine = trimmedLine.replace(/[\(\)\-\:\,]+$/g, '').trim();
 
-                let cleanTitle = trimmedLine.split(' ').map(word => {
+                let cleanTitle = trimmedLine.split(' ').map(function(word) {
                     if (word.length === 0) return '';
                     return word.charAt(0).toUpperCase() + word.slice(1);
                 }).join(' ');
 
-                const isExist = daftarLagu.some(l => l.title.toLowerCase() === cleanTitle.toLowerCase());
+                const isExist = daftarLagu.some(function(l) { return l.title.toLowerCase() === cleanTitle.toLowerCase(); });
 
                 if (!isExist) {
                     daftarLagu.push({
@@ -1413,7 +1414,7 @@
         reader.readAsText(file);
     }
 
-    // ================= FITUR GENERATE INDEX.HTML UTUK GITHUB =================
+    // ================= FITUR GENERATE INDEX.HTML UNTUK GITHUB =================
     function generateUpdatedIndexHtml() {
         if (!isAdmin) {
             showCustomAlert("Akses Terkunci", "Harus login Admin untuk generate file index.html!", "🔒");
@@ -1423,17 +1424,15 @@
         let nextVerNum = currentVerNum + 1;
         let htmlSource = document.documentElement.outerHTML;
 
-        // Injeksi data lagu terbaru ke variabel defaultData
+        // Replace data defaultData dengan data terbaru
         let formattedData = "const defaultData = " + JSON.stringify(daftarLagu, null, 8) + ";";
         htmlSource = htmlSource.replace(/const defaultData = \[[\s\S]*?\];/m, formattedData);
 
-        // Update nomor versi otomatis
-        let verRegex1 = new RegExp('let currentVerNum = parseInt\\(localStorage\\.getItem\\(\\'setlistVerNumVal\\'\\)\\) \\|\\| ' + currentVerNum + ';', 'g');
-        htmlSource = htmlSource.replace(verRegex1, 'let currentVerNum = parseInt(localStorage.getItem(\'setlistVerNumVal\')) || ' + nextVerNum + ';');
+        // Replace versi vX ke versi baru
+        htmlSource = htmlSource.replace(/let currentVerNum = parseInt\(localStorage\.getItem\('setlistVerNumVal'\)\) \|\| \d+;/g, "let currentVerNum = parseInt(localStorage.getItem('setlistVerNumVal')) || " + nextVerNum + ";");
 
         let fullCode = "<!DOCTYPE html>\n<html lang=\"id\">\n" + htmlSource.substring(htmlSource.indexOf('<head>'));
 
-        // Download otomatis
         const blob = new Blob([fullCode], { type: "text/html;charset=utf-8" });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
@@ -1539,7 +1538,10 @@
         }
     }
 
-    function buildSessionSongItem(rawLine, foundSong = null, customDetails = null) {
+    function buildSessionSongItem(rawLine, foundSong, customDetails) {
+        if (typeof foundSong === 'undefined') foundSong = null;
+        if (typeof customDetails === 'undefined') customDetails = null;
+
         const li = document.createElement('li');
         li.className = 'song-item';
 
@@ -1555,7 +1557,7 @@
         const btnYtClass = linkYoutube ? "info-link" : "info-link empty";
         const btnYtText = linkYoutube ? "Tonton ▶️" : "Kosong";
 
-        let dbBadge = foundSong ? `<small style="color:var(--success); font-weight:600;">(Ada di DB)</small>` : ``;
+        let dbBadge = foundSong ? '<small style="color:var(--success); font-weight:600;">(Ada di DB)</small>' : '';
 
         li.innerHTML = `
             <div class="song-title-row">
@@ -1592,7 +1594,7 @@
 
         let currentUl = document.createElement('ul');
 
-        lines.forEach(line => {
+        lines.forEach(function(line) {
             let rawLine = line.trim();
             if(!rawLine || rawLine === '-') return;
 
@@ -1616,7 +1618,7 @@
                 .replace(/[-]/g, ' ')
                 .trim();
 
-            let foundSong = daftarLagu.find(l => {
+            let foundSong = daftarLagu.find(function(l) {
                 let dbTitle = l.title.toLowerCase();
                 return dbTitle.includes(searchKey) || searchKey.includes(dbTitle);
             });
@@ -1639,7 +1641,7 @@
 
         const defaultSessions = ["SESI 1", "SESI 2", "OPTIONAL"];
 
-        defaultSessions.forEach(sessionName => {
+        defaultSessions.forEach(function(sessionName) {
             const sessionHeader = document.createElement('div');
             sessionHeader.className = 'session-title-header';
             sessionHeader.innerHTML = `
@@ -1730,7 +1732,7 @@
         const dbCategory = document.getElementById('editSesiCategory').value;
 
         if (saveToDb && title.length > 1) {
-            const isExist = daftarLagu.some(l => l.title.toLowerCase() === title.toLowerCase());
+            const isExist = daftarLagu.some(function(l) { return l.title.toLowerCase() === title.toLowerCase(); });
             if (!isExist) {
                 daftarLagu.push({
                     title: title,
@@ -1750,9 +1752,9 @@
         }
 
         let searchKey = title.toLowerCase().replace(/\(.*?\)/g, '').trim();
-        let foundSong = daftarLagu.find(l => l.title.toLowerCase().includes(searchKey));
+        let foundSong = daftarLagu.find(function(l) { return l.title.toLowerCase().includes(searchKey); });
 
-        const customDetails = { chordAsli, chordCowok, chordCewek, catatan, linkChord, linkYoutube };
+        const customDetails = { chordAsli: chordAsli, chordCowok: chordCowok, chordCewek: chordCewek, catatan: catatan, linkChord: linkChord, linkYoutube: linkYoutube };
         const newLi = buildSessionSongItem(title, (searchKey.length > 2 ? foundSong : null), customDetails);
 
         currentEditingLi.replaceWith(newLi);
@@ -1776,14 +1778,14 @@
         let children = Array.from(listContainer.children);
         let songIndex = 1;
 
-        children.forEach(child => {
+        children.forEach(function(child) {
             if (child.classList.contains('session-title-header')) {
                 let sessionName = child.querySelector('span') ? child.querySelector('span').innerText.trim() : child.innerText.trim();
                 result += `*${sessionName.toUpperCase()}*\n`;
                 songIndex = 1;
             } else if (child.tagName === 'UL') {
                 const items = child.querySelectorAll('li.song-item');
-                items.forEach(li => {
+                items.forEach(function(li) {
                     const titleSpan = li.querySelector('.song-title');
                     if (!titleSpan) return;
 
@@ -1823,9 +1825,9 @@
         }
 
         if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(text).then(() => {
+            navigator.clipboard.writeText(text).then(function() {
                 showCustomAlert("Teks Disalin", "Setlist berhasil disalin! Siap ditempel (paste) di WhatsApp.", "📋");
-            }).catch(() => {
+            }).catch(function() {
                 fallbackCopyText(text);
             });
         } else {
