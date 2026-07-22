@@ -968,7 +968,7 @@
     const folderKeys = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas'];
     let isAdmin = false;
 
-    let currentVerNum = parseInt(localStorage.getItem('setlistVerNumVal')) || 28;
+    let currentVerNum = parseInt(localStorage.getItem('setlistVerNumVal')) || 29;
     let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v' + currentVerNum));
     if (!daftarLagu || daftarLagu.length === 0) { 
         daftarLagu = defaultData;
@@ -1000,14 +1000,20 @@
         document.getElementById('customDialogOverlay').style.display = 'flex';
     }
 
-    function showCustomConfirm(title, message, onConfirm, icon) {
+    function showCustomConfirm(title, message, onConfirm, icon, confirmText, cancelText) {
         if (!icon) icon = "⚠️";
+        if (!confirmText) confirmText = "Ya, Lanjutkan";
+        if (!cancelText) cancelText = "Batal";
+
         document.getElementById('dialogIcon').innerText = icon;
         document.getElementById('dialogTitle').innerText = title;
         document.getElementById('dialogMessage').innerText = message;
         
         const actionsDiv = document.getElementById('dialogActions');
-        actionsDiv.innerHTML = '<button class="dialog-btn dialog-btn-cancel" onclick="closeCustomDialog()">Batal</button><button class="dialog-btn dialog-btn-danger" id="btnConfirmAction">Ya, Lanjutkan</button>';
+        actionsDiv.innerHTML = `
+            <button class="dialog-btn dialog-btn-cancel" onclick="closeCustomDialog()">${cancelText}</button>
+            <button class="dialog-btn dialog-btn-primary" id="btnConfirmAction">${confirmText}</button>
+        `;
         
         document.getElementById('btnConfirmAction').onclick = function() {
             closeCustomDialog();
@@ -1301,16 +1307,34 @@
         const linkChord = document.getElementById('inputLinkChord').value;
         const linkYoutube = document.getElementById('inputLinkYoutube').value;
 
-        const isDuplicate = daftarLagu.some(function(lagu, idx) {
+        // Cek duplikasi jika sedang membuat baru (index === -1) atau mengganti judul dengan yang sudah ada
+        const existingIndex = daftarLagu.findIndex(function(lagu, idx) {
             return lagu.title.toLowerCase() === title.toLowerCase() && idx !== index;
         });
 
-        if (isDuplicate) {
-            showCustomAlert("Lagu Sudah Ada", "Judul lagu ini sudah terdaftar di setlist!", "⚠️");
+        const newSong = { title: title, chordAsli: chordAsli, chordCowok: chordCowok, chordCewek: chordCewek, catatan: catatan, linkChord: linkChord, linkYoutube: linkYoutube, category: category };
+
+        if (existingIndex !== -1 && index === -1) {
+            // Jika lagu sudah ada dan posisinya baru, tawarkan Update atau Back
+            showCustomConfirm(
+                "Lagu Sudah Ada", 
+                `Lagu "${title}" sudah terdaftar di dalam setlist. Apakah kamu ingin mengubah/update datanya?`, 
+                function() {
+                    // Tombol Update ditekan
+                    daftarLagu[existingIndex] = newSong;
+                    renderSongs();
+                    closeModal();
+                    showCustomAlert("Berhasil Diupdate", `Data lagu "${title}" berhasil diperbarui!`, "✅");
+                    document.getElementById('container-Playlist').style.display = 'block';
+                    document.getElementById('icon-Playlist').innerText = "▲";
+                    openFolder(category);
+                },
+                "⚠️",
+                "Ubah / Update",
+                "Back"
+            );
             return;
         }
-
-        const newSong = { title: title, chordAsli: chordAsli, chordCowok: chordCowok, chordCewek: chordCewek, catatan: catatan, linkChord: linkChord, linkYoutube: linkYoutube, category: category };
 
         if (index >= 0) {
             daftarLagu[index] = newSong;
@@ -1332,7 +1356,7 @@
             daftarLagu.splice(index, 1);
             renderSongs();
             showCustomAlert("Terhapus", "Lagu berhasil dihapus.", "🗑️");
-        });
+        }, "⚠️", "Ya, Lanjutkan", "Batal");
     }
 
     function openImportModal() {
@@ -1488,7 +1512,7 @@
                         renderSongs();
                         closeBackupModal();
                         showCustomAlert("Restore Berhasil", "Seluruh data setlist lagu berhasil dikembalikan!", "✅");
-                    });
+                    }, "⚠️", "Ya, Lanjutkan", "Batal");
                 } else {
                     showCustomAlert("Format Salah", "File cadangan tidak valid!", "❌");
                 }
@@ -1506,7 +1530,7 @@
             renderSongs();
             closeBackupModal();
             showCustomAlert("Reset Berhasil", "Data telah dikembalikan ke awal.", "🔄");
-        });
+        }, "⚠️", "Ya, Lanjutkan", "Batal");
     }
 
     // ================= FITUR PASTE SETLIST & TABEL SESI =================
@@ -1767,7 +1791,7 @@
         showCustomConfirm("Hapus Baris Sesi", "Apakah kamu yakin ingin menghapus lagu ini dari list sesi?", function() {
             li.remove();
             showCustomAlert("Terhapus", "Lagu telah dihapus dari sesi.", "🗑️");
-        });
+        }, "⚠️", "Ya, Lanjutkan", "Batal");
     }
 
     // ================= FITUR EXPORT / KIRIM TEKS SETLIST SESI VIA WA =================
