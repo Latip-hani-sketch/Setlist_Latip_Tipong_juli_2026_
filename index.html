@@ -47,7 +47,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
 
         h2.header-title {
@@ -66,7 +66,7 @@
         /* Status Badge Admin / Viewer */
         .mode-badge {
             font-size: 11px;
-            padding: 4px 8px;
+            padding: 5px 10px;
             border-radius: 15px;
             font-weight: 600;
             cursor: pointer;
@@ -77,50 +77,39 @@
         .mode-viewer { background: #fef3c7; color: #b45309; }
         .mode-admin { background: #d1fae5; color: #047857; }
 
-        /* Tombol Admin */
-        .admin-controls { display: none; }
-        .admin-controls.active { display: block; }
-
-        .admin-btn-group {
+        /* Group Tombol Atas (Tambah Lagu & Import TXT) */
+        .action-btn-group {
             display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 12px; /* Jarak dibuat lebih renggang & rapi */
+            margin-bottom: 18px;
         }
 
-        .btn-add-global {
+        .btn-action-main {
             flex: 1;
+            border: none;
+            padding: 12px 10px;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .btn-action-main:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+
+        .btn-add-theme {
             background: var(--text-main);
             color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 10px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.2s;
         }
 
-        .btn-import-global {
-            flex: 1;
+        .btn-import-theme {
             background: var(--success);
             color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 10px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.2s;
         }
 
         /* Main Folder Button */
@@ -333,6 +322,9 @@
         }
         .info-link.empty { background: #f3f4f6; color: #9ca3af; pointer-events: none; }
 
+        .admin-inline-controls { display: none; }
+        .admin-inline-controls.active { display: block; }
+
         .action-group {
             display: flex;
             flex-wrap: wrap;
@@ -440,10 +432,10 @@
         <button id="modeBtn" class="mode-badge mode-viewer" onclick="toggleAdminMode()">👁️ Penonton</button>
     </div>
     
-    <!-- Group Tombol Admin (Tambah Lagu & Import TXT) -->
-    <div class="admin-controls admin-btn-group">
-        <button class="btn-add-global" onclick="openModal()">➕ Tambah Lagu</button>
-        <button class="btn-import-global" onclick="openImportModal()">📄 Import .txt</button>
+    <!-- Tombol Atas Tambah & Import TXT (Tampak Rapi & Memiliki Notifikasi jika Belum Login Admin) -->
+    <div class="action-btn-group">
+        <button class="btn-action-main btn-add-theme" onclick="openModal()">➕ Tambah Lagu</button>
+        <button class="btn-action-main btn-import-theme" onclick="openImportModal()">📄 Import .txt</button>
     </div>
 
     <!-- ==================== MAIN PLAYLIST ==================== -->
@@ -691,7 +683,7 @@
     const folderKeys = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas'];
     let isAdmin = false;
 
-    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v15'));
+    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v16'));
     if (!daftarLagu || daftarLagu.length === 0) { 
         daftarLagu = defaultData;
     }
@@ -717,7 +709,7 @@
 
     function updateAdminUI() {
         const modeBtn = document.getElementById('modeBtn');
-        const adminControls = document.querySelectorAll('.admin-controls');
+        const adminControls = document.querySelectorAll('.admin-inline-controls');
 
         if (isAdmin) {
             modeBtn.innerText = "👑 Admin";
@@ -848,7 +840,7 @@
             if(targetList) { targetList.appendChild(li); }
         });
         
-        localStorage.setItem('setlistTiponkData_v15', JSON.stringify(daftarLagu));
+        localStorage.setItem('setlistTiponkData_v16', JSON.stringify(daftarLagu));
     }
 
     function toggleDetails(element) {
@@ -915,8 +907,12 @@
         }
     }
 
+    // Modal Form Tambah Lagu (Cek Status Admin)
     function openModal(index = -1) {
-        if (!isAdmin) return;
+        if (!isAdmin) {
+            alert("🔒 Akses Terkunci!\nSilakan login terlebih dahulu sebagai Admin untuk menambahkan lagu baru.");
+            return;
+        }
         document.getElementById('songModal').style.display = 'flex';
         const isEdit = index >= 0;
         
@@ -989,9 +985,12 @@
         }
     }
 
-    // ================= FITUR IMPORT FILE .TXT =================
+    // Modal Import TXT (Cek Status Admin)
     function openImportModal() {
-        if (!isAdmin) return;
+        if (!isAdmin) {
+            alert("🔒 Akses Terkunci!\nSilakan login terlebih dahulu sebagai Admin untuk meng-import lagu dari file .txt.");
+            return;
+        }
         document.getElementById('importModal').style.display = 'flex';
         document.getElementById('txtFileInput').value = '';
     }
@@ -1001,6 +1000,7 @@
     }
 
     function processTxtImport() {
+        if (!isAdmin) return;
         const fileInput = document.getElementById('txtFileInput');
         const defaultCategory = document.getElementById('importDefaultCategory').value;
 
@@ -1021,30 +1021,24 @@
 
             lines.forEach(line => {
                 let trimmedLine = line.trim();
-                // Hapus nomor urut jika ada (contoh: "1. Mahalini", "2) Dewa 19")
                 trimmedLine = trimmedLine.replace(/^[\d+[\.\)\-]\s*/, '');
 
-                if (trimmedLine.length < 2) return; // Lewati baris kosong/terlalu pendek
+                if (trimmedLine.length < 2) return;
 
-                // Deteksi Chord Original di dalam baris teks
                 let chordAsli = "";
                 const chordMatch = trimmedLine.match(/(?:chord|key|nada|kunci|ori|original)[:\s]*([A-G][#b]?m?)/i);
                 if (chordMatch) {
                     chordAsli = chordMatch[1].toUpperCase();
-                    // Hapus keterangan chord dari teks judul agar judulnya bersih
                     trimmedLine = trimmedLine.replace(/(?:chord|key|nada|kunci|ori|original)[:\s]*[A-G][#b]?m?/gi, '').trim();
                 }
 
-                // Bersihkan tanda kurung yang tersisa
                 trimmedLine = trimmedLine.replace(/[\(\)\-\:\,]+$/g, '').trim();
 
-                // Format Rapikan Huruf Kapital (Title Case)
                 let cleanTitle = trimmedLine.split(' ').map(word => {
                     if (word.length === 0) return '';
                     return word.charAt(0).toUpperCase() + word.slice(1);
                 }).join(' ');
 
-                // Cek apakah lagu sudah ada (mencegah duplikat)
                 const isExist = daftarLagu.some(l => l.title.toLowerCase() === cleanTitle.toLowerCase());
 
                 if (!isExist) {
