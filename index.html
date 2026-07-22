@@ -131,13 +131,13 @@
         }
         .btn-action-main:hover { transform: translateY(-2px); }
 
-        .btn-add-theme { background: var(--text-main); color: var(--card-bg); }
+        .btn-add-theme { background: var(--text-main); color: var(--card-bg); width: 100%; }
         .btn-import-theme { background: var(--success); color: white; }
         .btn-paste-theme { background: #8b5cf6; color: white; width: 100%; margin-top: -4px; }
         .btn-backup-theme { background: var(--info); color: white; }
-        .btn-generate-theme { background: #f59e0b; color: white; width: 100%; margin-top: -4px; display: none; }
+        .btn-generate-theme { background: #f59e0b; color: white; width: 100%; margin-top: -4px; }
 
-        .admin-controls { display: none; }
+        .admin-controls { display: none !important; }
         .admin-controls.active { display: flex !important; }
 
         /* Main Folder Button */
@@ -554,10 +554,11 @@
     <!-- Group Tombol Atas -->
     <div class="action-btn-group">
         <button class="btn-action-main btn-add-theme" onclick="openModal()">➕ Tambah Lagu</button>
-        <button class="btn-action-main btn-import-theme" onclick="openImportModal()">📄 Import .txt</button>
-        <button class="btn-action-main btn-backup-theme" onclick="openBackupModal()">💾 Backup/Restore</button>
-        <button class="btn-action-main btn-generate-theme admin-controls" onclick="generateUpdatedIndexHtml()">⚙️ Generate index.html (Update GitHub)</button>
-        <button class="btn-action-main btn-paste-theme" onclick="openPasteModal()">📋 Paste Setlist Sesi Manggung</button>
+        <!-- Tombol Pengelola Khusus Admin -->
+        <button class="btn-action-main btn-import-theme admin-controls" onclick="openImportModal()">📄 Import .txt</button>
+        <button class="btn-action-main btn-backup-theme admin-controls" onclick="openBackupModal()">💾 Backup/Restore</button>
+        <button class="btn-action-main btn-generate-theme admin-controls" onclick="generateUpdatedIndexHtml()">⚙️ Generate index.html</button>
+        <button class="btn-action-main btn-paste-theme admin-controls" onclick="openPasteModal()">📋 Paste Setlist Sesi Manggung</button>
     </div>
 
     <!-- ==================== MAIN PLAYLIST ==================== -->
@@ -967,7 +968,7 @@
     const folderKeys = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas'];
     let isAdmin = false;
 
-    let currentVerNum = parseInt(localStorage.getItem('setlistVerNumVal')) || 27;
+    let currentVerNum = parseInt(localStorage.getItem('setlistVerNumVal')) || 28;
     let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v' + currentVerNum));
     if (!daftarLagu || daftarLagu.length === 0) { 
         daftarLagu = defaultData;
