@@ -429,7 +429,7 @@
             color: white;
         }
 
-        /* Modal Popup Form & Import */
+        /* Modal Overlay & Custom Dialog Melayang di Tengah */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -445,11 +445,11 @@
             width: 100%;
             max-width: 380px;
             border-radius: 16px;
-            padding: 15px;
+            padding: 18px;
             max-height: 85vh;
             overflow-y: auto;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.25s ease;
         }
         .modal-content h3 { margin-top: 0; color: var(--text-main); font-size: 16px; margin-bottom: 12px; }
         .form-group { margin-bottom: 10px; }
@@ -470,6 +470,39 @@
         }
         .btn-cancel { background: #e5e7eb; color: var(--text-main); }
         .btn-save { background: var(--primary); color: white; }
+
+        /* Custom Center Dialog (Menggantikan Alert & Confirm Pop-up Bawaan Browser) */
+        #customDialogOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .dialog-box {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            animation: fadeIn 0.2s ease;
+        }
+        .dialog-icon { font-size: 32px; margin-bottom: 8px; }
+        .dialog-title { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
+        .dialog-message { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4; }
+        .dialog-actions { display: flex; gap: 8px; justify-content: center; }
+        .dialog-btn {
+            flex: 1; padding: 10px; border: none; border-radius: 10px;
+            font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;
+        }
+        .dialog-btn-primary { background: var(--primary); color: white; }
+        .dialog-btn-danger { background: var(--danger); color: white; }
+        .dialog-btn-cancel { background: #e5e7eb; color: var(--text-main); }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-5px); }
@@ -581,7 +614,7 @@
     </div>
 </div>
 
-<!-- Modal Form Tambah/Edit Lagu Utama (Pop Indo, etc.) -->
+<!-- Modal Form Tambah/Edit Lagu Utama -->
 <div id="songModal" class="modal-overlay">
     <div class="modal-content">
         <h3 id="modalTitle">Tambah Lagu Baru</h3>
@@ -634,7 +667,7 @@
     </div>
 </div>
 
-<!-- MODAL FORM EDIT KHUSUS SESI MANGGUNG (+ BISA SIMPAN KE PLAYLIST UTAMA) -->
+<!-- MODAL FORM EDIT KHUSUS SESI MANGGUNG -->
 <div id="editSessionModal" class="modal-overlay">
     <div class="modal-content">
         <h3>✏️ Edit Lagu & Chord Sesi</h3>
@@ -668,7 +701,6 @@
                 <input type="url" id="editSesiLinkYoutube" placeholder="https://...">
             </div>
 
-            <!-- OPSI BARU: SIMPAN PERMANEN KE PLAYLIST UTAMA -->
             <div class="form-group" style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed var(--border-color);">
                 <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600; color:var(--primary);">
                     <input type="checkbox" id="editSesiSaveToDb" onchange="toggleCategorySelectInSesiEdit(this.checked)">
@@ -728,13 +760,11 @@
     <div class="modal-content">
         <h3>📋 Setlist Manggung (Sesi)</h3>
         
-        <!-- Pilihan 2 Fitur Tab -->
         <div class="tab-menu-group">
             <button id="btnTab1" class="tab-btn active" onclick="switchPasteTab(1)">1. Paste Teks Acak</button>
             <button id="btnTab2" class="tab-btn" onclick="switchPasteTab(2)">2. Template Tabel Kosong</button>
         </div>
         
-        <!-- TAB 1: PASTE TEKS ACAK -->
         <div id="tabContent1">
             <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
                 Tempelkan salinan ketikan dari WA/Notepad. Otomatis dirapikan & dicocokkan ke database chord!
@@ -748,7 +778,6 @@
             </div>
         </div>
 
-        <!-- TAB 2: TEMPLATE TABEL KOSONG (SESI 1, SESI 2, OPTIONAL) -->
         <div id="tabContent2" style="display:none;">
             <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
                 Buat struktur Sesi 1, Sesi 2, dan Optional secara instan dengan tabel yang siap diisi.
@@ -758,6 +787,31 @@
                 <button type="button" class="btn-save" style="background:#8b5cf6" onclick="generateEmptyTemplateSesi()">🚀 Buat Tabel Sesi</button>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- MODAL LOGIN ADMIN PERINGATAN MELAYANG -->
+<div id="adminLoginModal" class="modal-overlay">
+    <div class="modal-content" style="max-width:320px; text-align:center;">
+        <h3>🔑 Login Admin</h3>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Masukkan password untuk membuka fitur Admin.</p>
+        <div class="form-group">
+            <input type="password" id="adminPasswordInput" placeholder="Password Admin" style="text-align:center;">
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-cancel" onclick="closeAdminLoginModal()">Batal</button>
+            <button type="button" class="btn-save" onclick="submitAdminPassword()">Login</button>
+        </div>
+    </div>
+</div>
+
+<!-- CUSTOM CENTER DIALOG OVERLAY (Menggantikan Alert & Confirm Browser) -->
+<div id="customDialogOverlay">
+    <div class="dialog-box">
+        <div id="dialogIcon" class="dialog-icon">ℹ️</div>
+        <div id="dialogTitle" class="dialog-title">Informasi</div>
+        <div id="dialogMessage" class="dialog-message">Pesan notifikasi di sini...</div>
+        <div id="dialogActions" class="dialog-actions"></div>
     </div>
 </div>
 
@@ -843,28 +897,72 @@
     const folderKeys = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas'];
     let isAdmin = false;
 
-    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v22'));
+    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v23'));
     if (!daftarLagu || daftarLagu.length === 0) { 
         daftarLagu = defaultData;
     }
 
+    // ================= CUSTOM CENTER DIALOG SYSTEM =================
+    function showCustomAlert(title, message, icon = "ℹ️") {
+        document.getElementById('dialogIcon').innerText = icon;
+        document.getElementById('dialogTitle').innerText = title;
+        document.getElementById('dialogMessage').innerText = message;
+        
+        const actionsDiv = document.getElementById('dialogActions');
+        actionsDiv.innerHTML = `<button class="dialog-btn dialog-btn-primary" onclick="closeCustomDialog()">Oke</button>`;
+        
+        document.getElementById('customDialogOverlay').style.display = 'flex';
+    }
+
+    function showCustomConfirm(title, message, onConfirm, icon = "⚠️") {
+        document.getElementById('dialogIcon').innerText = icon;
+        document.getElementById('dialogTitle').innerText = title;
+        document.getElementById('dialogMessage').innerText = message;
+        
+        const actionsDiv = document.getElementById('dialogActions');
+        actionsDiv.innerHTML = `
+            <button class="dialog-btn dialog-btn-cancel" onclick="closeCustomDialog()">Batal</button>
+            <button class="dialog-btn dialog-btn-danger" id="btnConfirmAction">Ya, Hapus</button>
+        `;
+        
+        document.getElementById('btnConfirmAction').onclick = function() {
+            closeCustomDialog();
+            onConfirm();
+        };
+
+        document.getElementById('customDialogOverlay').style.display = 'flex';
+    }
+
+    function closeCustomDialog() {
+        document.getElementById('customDialogOverlay').style.display = 'none';
+    }
+
+    // Admin Toggle System (Melayang di Tengah)
     function toggleAdminMode() {
         if (!isAdmin) {
-            let pass = prompt("Masukkan Password Admin:");
-            if (pass === "tiponk123") {
-                isAdmin = true;
-                alert("Berhasil masuk sebagai Admin!");
-            } else if (pass !== null) {
-                alert("Password salah!");
-                return;
-            } else {
-                return;
-            }
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('adminLoginModal').style.display = 'flex';
         } else {
             isAdmin = false;
-            alert("Keluar dari Mode Admin (Kembali jadi Penonton)");
+            showCustomAlert("Mode Penonton", "Kamu telah keluar dari Mode Admin.", "👁️");
+            updateAdminUI();
         }
-        updateAdminUI();
+    }
+
+    function closeAdminLoginModal() {
+        document.getElementById('adminLoginModal').style.display = 'none';
+    }
+
+    function submitAdminPassword() {
+        const pass = document.getElementById('adminPasswordInput').value;
+        if (pass === "tiponk123") {
+            isAdmin = true;
+            closeAdminLoginModal();
+            showCustomAlert("Berhasil Login!", "Kamu sekarang dalam Mode Admin.", "👑");
+            updateAdminUI();
+        } else {
+            showCustomAlert("Password Salah!", "Kata sandi Admin yang dimasukkan tidak sesuai.", "❌");
+        }
     }
 
     function updateAdminUI() {
@@ -1006,7 +1104,7 @@
             if(targetList) { targetList.appendChild(li); }
         });
         
-        localStorage.setItem('setlistTiponkData_v22', JSON.stringify(daftarLagu));
+        localStorage.setItem('setlistTiponkData_v23', JSON.stringify(daftarLagu));
     }
 
     function toggleDetails(element) {
@@ -1075,7 +1173,7 @@
 
     function openModal(index = -1) {
         if (!isAdmin) {
-            alert("🔒 Akses Terkunci!\nSilakan login terlebih dahulu sebagai Admin untuk menambahkan lagu baru.");
+            showCustomAlert("Akses Terkunci", "Silakan login terlebih dahulu sebagai Admin untuk menambahkan lagu baru.", "🔒");
             return;
         }
         document.getElementById('songModal').style.display = 'flex';
@@ -1122,7 +1220,7 @@
         });
 
         if (isDuplicate) {
-            alert("Lagu yang Anda tambahkan sudah ada di dalam setlist!");
+            showCustomAlert("Lagu Sudah Ada", "Judul lagu ini sudah terdaftar di setlist!", "⚠️");
             return;
         }
 
@@ -1144,15 +1242,16 @@
 
     function hapusLagu(index) {
         if (!isAdmin) return;
-        if(confirm("Apakah kamu yakin ingin menghapus lagu ini dari setlist?")) {
+        showCustomConfirm("Hapus Lagu", `Apakah kamu yakin ingin menghapus "${daftarLagu[index].title}" dari setlist?`, function() {
             daftarLagu.splice(index, 1);
             renderSongs();
-        }
+            showCustomAlert("Terhapus", "Lagu berhasil dihapus.", "🗑️");
+        });
     }
 
     function openImportModal() {
         if (!isAdmin) {
-            alert("🔒 Akses Terkunci!\nSilakan login terlebih dahulu sebagai Admin untuk meng-import lagu.");
+            showCustomAlert("Akses Terkunci", "Silakan login terlebih dahulu sebagai Admin untuk meng-import lagu.", "🔒");
             return;
         }
         document.getElementById('importModal').style.display = 'flex';
@@ -1169,7 +1268,7 @@
         const defaultCategory = document.getElementById('importDefaultCategory').value;
 
         if (!fileInput.files || fileInput.files.length === 0) {
-            alert("Silakan pilih file .txt terlebih dahulu!");
+            showCustomAlert("Pilih File", "Silakan pilih file .txt terlebih dahulu!", "📄");
             return;
         }
 
@@ -1224,7 +1323,7 @@
 
             renderSongs();
             closeImportModal();
-            alert(`Selesai Generate!\n✅ ${countAdded} lagu baru berhasil ditambahkan.\n⚠️ ${countSkipped} lagu dilewati (karena sudah ada di daftar).`);
+            showCustomAlert("Proses Selesai", `✅ ${countAdded} lagu berhasil ditambahkan.\n⚠️ ${countSkipped} lagu dilewati (duplikat).`, "🚀");
         };
 
         reader.readAsText(file);
@@ -1260,7 +1359,6 @@
         }
     }
 
-    // HELPER: BUAT ITEM LAGU UNTUK SESI MANGGUNG
     function buildSessionSongItem(rawLine, foundSong = null, customDetails = null) {
         const li = document.createElement('li');
         li.className = 'song-item';
@@ -1301,11 +1399,10 @@
         return li;
     }
 
-    // TAB 1: PASTE TEKS ACAK
     function processPasteSetlist() {
         const text = document.getElementById('pasteTextArea').value.trim();
         if(!text) {
-            alert("Silakan tempel (paste) teks setlist terlebih dahulu!");
+            showCustomAlert("Teks Kosong", "Silakan tempel (paste) teks setlist terlebih dahulu!", "⚠️");
             return;
         }
 
@@ -1356,7 +1453,6 @@
         openFolder('SesiManggung');
     }
 
-    // TAB 2: BUAT TEMPLATE TABEL KOSONG (SESI 1, SESI 2, OPTIONAL)
     function generateEmptyTemplateSesi() {
         const listContainer = document.getElementById('list-SesiManggung');
         listContainer.innerHTML = '';
@@ -1382,7 +1478,6 @@
         openFolder('SesiManggung');
     }
 
-    // Tambah Kolom/Baris Kosong Saja (Tanpa langsung memicu popup)
     function addEmptySlotToUl(btnEl) {
         const headerDiv = btnEl.parentNode;
         let ul = headerDiv.nextElementSibling;
@@ -1396,7 +1491,7 @@
         ul.appendChild(li);
     }
 
-    // ================= EDIT FORM LENGKAP KHUSUS SESI =================
+    // Edit Form Khusus Sesi
     let currentEditingLi = null;
 
     function openEditSessionModal(btnEl) {
@@ -1424,7 +1519,6 @@
         document.getElementById('editSesiLinkChord').value = valLinkChord;
         document.getElementById('editSesiLinkYoutube').value = valLinkYt;
 
-        // Reset Pilihan Simpan DB
         document.getElementById('editSesiSaveToDb').checked = false;
         document.getElementById('groupSesiCategory').style.display = 'none';
 
@@ -1455,7 +1549,6 @@
         const saveToDb = document.getElementById('editSesiSaveToDb').checked;
         const dbCategory = document.getElementById('editSesiCategory').value;
 
-        // SIMPAN PERMANEN KE DATABASE UTAMA (PLAYLIST TIPONG) JIKA DICENTANG
         if (saveToDb && title.length > 1) {
             const isExist = daftarLagu.some(l => l.title.toLowerCase() === title.toLowerCase());
             if (!isExist) {
@@ -1469,14 +1562,13 @@
                     linkYoutube: linkYoutube,
                     category: dbCategory
                 });
-                renderSongs(); // Update tampilan Playlist Utama
-                alert(`✅ Lagu "${title}" berhasil dimasukkan ke Playlist Utama (${dbCategory})!`);
+                renderSongs();
+                showCustomAlert("Tersimpan!", `Lagu "${title}" berhasil dimasukkan ke Playlist Utama (${dbCategory}).`, "✅");
             } else {
-                alert(`ℹ️ Lagu "${title}" sudah ada di Playlist Utama.`);
+                showCustomAlert("Sudah Ada", `Lagu "${title}" sudah ada di Playlist Utama.`, "ℹ️");
             }
         }
 
-        // Cek apakah judul cocok dengan lagu di DB
         let searchKey = title.toLowerCase().replace(/\(.*?\)/g, '').trim();
         let foundSong = daftarLagu.find(l => l.title.toLowerCase().includes(searchKey));
 
@@ -1487,12 +1579,12 @@
         closeEditSessionModal();
     }
 
-    // Hapus Baris Lagu di Sesi
     function deleteSessionItem(btnEl) {
-        if(confirm("Hapus lagu ini dari list sesi?")) {
-            const li = btnEl.closest('li.song-item');
+        const li = btnEl.closest('li.song-item');
+        showCustomConfirm("Hapus Baris Sesi", "Apakah kamu yakin ingin menghapus lagu ini dari list sesi?", function() {
             li.remove();
-        }
+            showCustomAlert("Terhapus", "Lagu telah dihapus dari sesi.", "🗑️");
+        });
     }
 
     renderSongs();
