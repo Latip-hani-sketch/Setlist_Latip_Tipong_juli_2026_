@@ -18,7 +18,6 @@
             --danger: #ef4444;
             --warning: #f59e0b;
             --info: #0ea5e9;
-            --success: #10b981;
         }
 
         body { 
@@ -26,9 +25,10 @@
             background: linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);
             color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 20px 15px 150px 15px; /* Padding bawah sengaja dilegakan khusus iPhone */
             min-height: 100vh;
             box-sizing: border-box;
+            -webkit-overflow-scrolling: touch; /* Supaya smooth scrolling di iPhone */
         }
 
         .container { 
@@ -37,7 +37,7 @@
             background: var(--card-bg);
             border-radius: 24px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-            padding: 25px;
+            padding: 25px 25px 120px 25px; /* Ruang bawah kontainer diperbesar drastis */
             overflow: hidden;
             position: relative;
         }
@@ -118,7 +118,7 @@
         /* Container Playlist */
         .playlist-container {
             display: block;
-            padding-bottom: 10px;
+            padding-bottom: 30px;
             animation: fadeIn 0.3s ease;
         }
 
@@ -286,13 +286,8 @@
         .info-link:hover { background: #c7d2fe; }
         .info-link.empty { background: #f3f4f6; color: #9ca3af; pointer-events: none; }
 
-        /* Actions (Admin Only) */
-        .admin-controls {
-            display: none; /* Sembunyikan default untuk mode penonton */
-        }
-        .admin-controls.active {
-            display: block; /* Muncul jika mode admin aktif */
-        }
+        .admin-controls { display: none; }
+        .admin-controls.active { display: block; }
 
         .action-group {
             display: flex;
@@ -420,8 +415,8 @@
         }
 
         @media (max-width: 480px) {
-            body { padding: 10px; }
-            .container { padding: 15px; border-radius: 16px; }
+            body { padding: 10px 10px 150px 10px; }
+            .container { padding: 15px 15px 80px 15px; }
             .info-label { width: 95px; font-size: 12px; }
             .info-value, .info-link { font-size: 12px; }
             .song-badge-detail { font-size: 10px; padding: 3px 6px; }
@@ -433,11 +428,9 @@
 <div class="container">
     <div class="top-bar">
         <h2 class="header-title">🎧 Setlist Pro</h2>
-        <!-- Tombol Status Mode: Klik untuk login Admin -->
         <button id="modeBtn" class="mode-badge mode-viewer" onclick="toggleAdminMode()">👁️ Penonton</button>
     </div>
     
-    <!-- Tombol Tambah Lagu (Hanya muncul jika mode Admin aktif) -->
     <button id="addGlobalBtn" class="btn-add-global admin-controls" onclick="openModal()">➕ Tambah Lagu Baru</button>
 
     <!-- ==================== MAIN PLAYLIST ==================== -->
@@ -636,18 +629,17 @@
     ];
 
     const folderKeys = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas'];
-    let isAdmin = false; // Status awal sebagai penonton (viewer)
+    let isAdmin = false;
 
-    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v9'));
+    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v11'));
     if (!daftarLagu || daftarLagu.length === 0) { 
         daftarLagu = defaultData;
     }
 
-    // Fungsi Login/Logout Admin Sederhana pakai Password
     function toggleAdminMode() {
         if (!isAdmin) {
             let pass = prompt("Masukkan Password Admin:");
-            if (pass === "tiponk123") { // <-- Ganti password di sini kalau mau
+            if (pass === "tiponk123") {
                 isAdmin = true;
                 alert("Berhasil masuk sebagai Admin!");
             } else if (pass !== null) {
@@ -720,7 +712,6 @@
             const btnYtClass = lagu.linkYoutube ? "info-link" : "info-link empty";
             const btnYtText = lagu.linkYoutube ? "Tonton ▶️" : "Kosong";
 
-            // Tampilkan tombol edit/hapus dan opsi pindah folder HANYA jika sedang mode Admin
             let adminActionHtml = '';
             if (isAdmin) {
                 adminActionHtml = `
@@ -784,7 +775,7 @@
             if(targetList) { targetList.appendChild(li); }
         });
         
-        localStorage.setItem('setlistTiponkData_v9', JSON.stringify(daftarLagu));
+        localStorage.setItem('setlistTiponkData_v11', JSON.stringify(daftarLagu));
     }
 
     function toggleDetails(element) {
@@ -875,7 +866,6 @@
         const linkChord = document.getElementById('inputLinkChord').value;
         const linkYoutube = document.getElementById('inputLinkYoutube').value;
 
-        // Cek Lagu Duplikat
         const isDuplicate = daftarLagu.some((lagu, idx) => {
             return lagu.title.toLowerCase() === title.toLowerCase() && idx !== index;
         });
