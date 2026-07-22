@@ -25,7 +25,7 @@
             background: linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);
             color: var(--text-main);
             margin: 0;
-            padding: 15px 10px 180px 10px; /* Padding bawah ekstra ringkas khusus iPhone */
+            padding: 15px 10px 180px 10px;
             min-height: 100vh;
             box-sizing: border-box;
             -webkit-overflow-scrolling: touch;
@@ -37,7 +37,7 @@
             background: var(--card-bg);
             border-radius: 20px;
             box-shadow: 0 15px 30px rgba(0,0,0,0.08);
-            padding: 15px 15px 100px 15px;
+            padding: 15px 15px 80px 15px;
             overflow: hidden;
             position: relative;
         }
@@ -114,16 +114,15 @@
             box-shadow: 0 6px 15px rgba(99, 102, 241, 0.2);
         }
 
-        /* Container Playlist */
         .playlist-container {
             display: block;
             padding-bottom: 10px;
             animation: fadeIn 0.3s ease;
         }
 
-        /* Search Box */
-        .search-local { position: relative; margin-bottom: 10px; }
-        .search-local input {
+        /* Search Input General */
+        .search-box { position: relative; margin-bottom: 10px; }
+        .search-box input {
             width: 100%;
             padding: 10px 12px 10px 36px;
             background: #f9fafb;
@@ -134,7 +133,7 @@
             transition: all 0.3s ease;
             box-sizing: border-box;
         }
-        .search-local input:focus {
+        .search-box input:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
@@ -149,7 +148,7 @@
             font-size: 14px;
         }
 
-        /* Grid Folders Ramping (Tanpa Simbol & Ukuran Diperkecil) */
+        /* Grid Folders Kategori Utama */
         .folders-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -171,7 +170,7 @@
             transition: all 0.2s ease;
             -webkit-tap-highlight-color: transparent;
             text-align: center;
-            height: 38px; /* Dibuat pendek & ramping */
+            height: 38px;
         }
         .sub-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         
@@ -183,13 +182,35 @@
         .btn-lawas { color: #b45309; }
         .btn-lawas:hover { border-color: #f59e0b; background: #fef3c7; }
 
+        /* Tampilan Dalam Folder */
         .sub-content {
             display: none;
             background: #f9fafb;
             border-radius: 12px;
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 10px;
             border: 1px solid var(--border-color);
+        }
+
+        .category-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .close-folder {
+            background: #e5e7eb;
+            color: #4b5563;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 600;
         }
 
         /* List Lagu */
@@ -334,30 +355,7 @@
         .btn-edit { background: var(--warning); }
         .btn-delete { background: var(--danger); }
 
-        .category-header {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .close-folder {
-            background: #e5e7eb;
-            color: #4b5563;
-            border: none;
-            padding: 3px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        /* Modal / Popup Form */
+        /* Modal Popup Form */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -422,13 +420,14 @@
     </div>
     
     <div id="container-Playlist" class="playlist-container">
-        <div class="search-local">
+        <!-- PENCARIAN UTAMA (Cari di semua lagu & kategori) -->
+        <div class="search-box" id="global-search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" id="search-Input" oninput="searchLagu(this.value)" placeholder="Cari lagu di playlist...">
+            <input type="text" id="search-Global" oninput="searchGlobal(this.value)" placeholder="Cari lagu di semua folder...">
         </div>
         
-        <!-- 4 Kotak Kategori Ramping & Ringkas -->
-        <div class="folders-grid">
+        <!-- 4 Kotak Kategori Utama -->
+        <div class="folders-grid" id="folders-grid">
             <div class="sub-btn btn-pop-indo" onclick="openFolder('PopIndo')">
                 <span>Pop Indo</span>
             </div>
@@ -443,42 +442,63 @@
             </div>
         </div>
 
-        <!-- Area Konten (4 Folder) -->
+        <!-- AREA HALAMAN FOLDER (Hanya Muncul 1 Saat Diklik) -->
+        
+        <!-- FOLDER POP INDO -->
         <div id="content-PopIndo" class="sub-content">
             <div class="category-header">
-                <span>Daftar Lagu Pop Indo</span>
-                <button class="close-folder" onclick="closeFolder('PopIndo')">Tutup ✖</button>
+                <span>🎵 POP INDO</span>
+                <button class="close-folder" onclick="closeAllFolders()">⬅ Kembali</button>
+            </div>
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-PopIndo" oninput="filterCategory('PopIndo', this.value)" placeholder="Cari lagu Pop Indo...">
             </div>
             <ul id="list-PopIndo"></ul>
         </div>
 
+        <!-- FOLDER POP INGGRIS -->
         <div id="content-PopInggris" class="sub-content">
             <div class="category-header" style="color: #0891b2;">
-                <span>Daftar Lagu Pop Inggris</span>
-                <button class="close-folder" onclick="closeFolder('PopInggris')">Tutup ✖</button>
+                <span>🎧 POP INGGRIS</span>
+                <button class="close-folder" onclick="closeAllFolders()">⬅ Kembali</button>
+            </div>
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-PopInggris" oninput="filterCategory('PopInggris', this.value)" placeholder="Cari lagu Pop Inggris...">
             </div>
             <ul id="list-PopInggris"></ul>
         </div>
 
+        <!-- FOLDER AMBYAR -->
         <div id="content-Ambyar" class="sub-content">
             <div class="category-header" style="color: #be185d;">
-                <span>Daftar Lagu Ambyar</span>
-                <button class="close-folder" onclick="closeFolder('Ambyar')">Tutup ✖</button>
+                <span>💔 AMBYAR</span>
+                <button class="close-folder" onclick="closeAllFolders()">⬅ Kembali</button>
+            </div>
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-Ambyar" oninput="filterCategory('Ambyar', this.value)" placeholder="Cari lagu Ambyar...">
             </div>
             <ul id="list-Ambyar"></ul>
         </div>
 
+        <!-- FOLDER LAWAS -->
         <div id="content-Lawas" class="sub-content">
             <div class="category-header" style="color: #b45309;">
-                <span>Daftar Lagu Lawas</span>
-                <button class="close-folder" onclick="closeFolder('Lawas')">Tutup ✖</button>
+                <span>📻 LAWAS</span>
+                <button class="close-folder" onclick="closeAllFolders()">⬅ Kembali</button>
+            </div>
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-Lawas" oninput="filterCategory('Lawas', this.value)" placeholder="Cari lagu Lawas...">
             </div>
             <ul id="list-Lawas"></ul>
         </div>
     </div>
 </div>
 
-<!-- Modal Tambah/Edit -->
+<!-- Modal Form Tambah/Edit -->
 <div id="songModal" class="modal-overlay">
     <div class="modal-content">
         <h3 id="modalTitle">Tambah Lagu Baru</h3>
@@ -613,7 +633,7 @@
     const folderKeys = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas'];
     let isAdmin = false;
 
-    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v12'));
+    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v13'));
     if (!daftarLagu || daftarLagu.length === 0) { 
         daftarLagu = defaultData;
     }
@@ -663,19 +683,35 @@
         } else {
             container.style.display = "none";
             icon.innerText = "▼";
-            folderKeys.forEach(closeFolder);
-            document.getElementById('search-Input').value = "";
-            searchLagu("");
+            closeAllFolders();
+            document.getElementById('search-Global').value = "";
+            searchGlobal("");
         }
     }
 
+    // Buka hanya 1 folder spesifik, sembunyikan kotak folder utama
     function openFolder(targetCategory) {
-        folderKeys.forEach(cat => closeFolder(cat));
-        document.getElementById(`content-${targetCategory}`).style.display = 'block';
+        document.getElementById('folders-grid').style.display = 'none';
+        document.getElementById('global-search-box').style.display = 'none';
+        
+        folderKeys.forEach(cat => {
+            document.getElementById(`content-${cat}`).style.display = (cat === targetCategory) ? 'block' : 'none';
+            // Reset input pencarian lokal tiap kali folder dibuka
+            const searchInput = document.getElementById(`search-${cat}`);
+            if(searchInput) {
+                searchInput.value = "";
+                filterCategory(cat, "");
+            }
+        });
     }
 
-    function closeFolder(category) {
-        document.getElementById(`content-${category}`).style.display = 'none';
+    // Kembali ke menu utama (Tampilkan 4 kotak folder lagi)
+    function closeAllFolders() {
+        document.getElementById('folders-grid').style.display = 'grid';
+        document.getElementById('global-search-box').style.display = 'block';
+        folderKeys.forEach(cat => {
+            document.getElementById(`content-${cat}`).style.display = 'none';
+        });
     }
 
     function renderSongs() {
@@ -757,7 +793,7 @@
             if(targetList) { targetList.appendChild(li); }
         });
         
-        localStorage.setItem('setlistTiponkData_v12', JSON.stringify(daftarLagu));
+        localStorage.setItem('setlistTiponkData_v13', JSON.stringify(daftarLagu));
     }
 
     function toggleDetails(element) {
@@ -772,11 +808,11 @@
         openFolder(newCategory);
     }
 
-    function searchLagu(filter) {
+    // PENCARIAN GLOBAL (Layar Depan Utama)
+    function searchGlobal(filter) {
         filter = filter.toLowerCase();
-        const container = document.getElementById('container-Playlist');
-        const items = container.getElementsByClassName('song-item');
-        const foldersGrid = document.querySelector('.folders-grid');
+        const items = document.getElementsByClassName('song-item');
+        const foldersGrid = document.getElementById('folders-grid');
 
         let foundCategories = {
             PopIndo: false,
@@ -800,15 +836,29 @@
         }
 
         if (filter.length > 0) {
-            // Sembunyikan kotak folder tombol saat mengetik agar layar lebih lega
-            foldersGrid.style.display = 'none';
+            foldersGrid.style.display = 'none'; // Sembunyikan kotak 4 folder
             folderKeys.forEach(cat => {
                 document.getElementById(`content-${cat}`).style.display = foundCategories[cat] ? 'block' : 'none';
             });
         } else {
-            // Tampilkan kembali folder tombol jika kolom cari kosong
-            foldersGrid.style.display = 'grid';
-            folderKeys.forEach(closeFolder);
+            closeAllFolders(); // Kembalikan ke tampilan 4 folder awal
+        }
+    }
+
+    // PENCARIAN LOKAL KHUSUS PER FOLDER (Misal: Khusus Pop Indo Saja)
+    function filterCategory(categoryKey, filter) {
+        filter = filter.toLowerCase();
+        const targetList = document.getElementById(`list-${categoryKey}`);
+        if(!targetList) return;
+
+        const items = targetList.getElementsByClassName('song-item');
+        for (let i = 0; i < items.length; i++) {
+            let title = items[i].querySelector('.song-title').innerText.toLowerCase();
+            if (title.includes(filter)) {
+                items[i].style.display = "";
+            } else {
+                items[i].style.display = "none";
+            }
         }
     }
 
