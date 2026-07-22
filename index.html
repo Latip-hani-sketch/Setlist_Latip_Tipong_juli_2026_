@@ -25,19 +25,19 @@
             background: linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);
             color: var(--text-main);
             margin: 0;
-            padding: 20px 15px 150px 15px; /* Padding bawah sengaja dilegakan khusus iPhone */
+            padding: 15px 10px 180px 10px; /* Padding bawah ekstra ringkas khusus iPhone */
             min-height: 100vh;
             box-sizing: border-box;
-            -webkit-overflow-scrolling: touch; /* Supaya smooth scrolling di iPhone */
+            -webkit-overflow-scrolling: touch;
         }
 
         .container { 
             max-width: 550px; 
             margin: auto; 
             background: var(--card-bg);
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-            padding: 25px 25px 120px 25px; /* Ruang bawah kontainer diperbesar drastis */
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+            padding: 15px 15px 100px 15px;
             overflow: hidden;
             position: relative;
         }
@@ -46,26 +46,27 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         h2.header-title {
             text-align: center;
             font-weight: 700;
             margin: 0;
+            font-size: 18px;
             color: var(--text-main);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             flex: 1;
         }
 
         /* Status Badge Admin / Viewer */
         .mode-badge {
             font-size: 11px;
-            padding: 5px 10px;
-            border-radius: 20px;
+            padding: 4px 8px;
+            border-radius: 15px;
             font-weight: 600;
             cursor: pointer;
             border: none;
@@ -81,28 +82,27 @@
             background: var(--text-main);
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 12px;
+            padding: 10px;
+            border-radius: 10px;
             font-family: 'Poppins', sans-serif;
             font-weight: 600;
-            font-size: 15px;
+            font-size: 13px;
             cursor: pointer;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             transition: all 0.2s;
         }
-        .btn-add-global:hover { background: #374151; transform: translateY(-2px); }
 
         /* Main Folder Button */
         .main-btn {
             color: white;
-            padding: 18px 20px;
-            font-size: 18px;
+            padding: 12px 16px;
+            font-size: 15px;
             font-weight: 600;
-            border-radius: 16px;
+            border-radius: 12px;
             cursor: pointer;
             margin-bottom: 10px;
             display: flex;
@@ -111,26 +111,25 @@
             transition: transform 0.2s, box-shadow 0.2s;
             -webkit-tap-highlight-color: transparent;
             background: linear-gradient(135deg, var(--primary), #8b5cf6);
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 6px 15px rgba(99, 102, 241, 0.2);
         }
-        .main-btn:hover { box-shadow: 0 12px 25px rgba(99, 102, 241, 0.3); transform: translateY(-2px); }
 
         /* Container Playlist */
         .playlist-container {
             display: block;
-            padding-bottom: 30px;
+            padding-bottom: 10px;
             animation: fadeIn 0.3s ease;
         }
 
         /* Search Box */
-        .search-local { position: relative; margin-bottom: 15px; }
+        .search-local { position: relative; margin-bottom: 10px; }
         .search-local input {
             width: 100%;
-            padding: 14px 15px 14px 40px;
+            padding: 10px 12px 10px 36px;
             background: #f9fafb;
             border: 2px solid var(--border-color);
-            border-radius: 14px;
-            font-size: 14px;
+            border-radius: 10px;
+            font-size: 13px;
             font-family: 'Poppins', sans-serif;
             transition: all 0.3s ease;
             box-sizing: border-box;
@@ -143,52 +142,53 @@
         }
         .search-icon {
             position: absolute;
-            left: 14px;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
             color: #9ca3af;
-            font-size: 16px;
+            font-size: 14px;
         }
 
-        /* Grid Folders */
+        /* Grid Folders Ramping (Tanpa Simbol & Ukuran Diperkecil) */
         .folders-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
         .sub-btn {
             background: #f8fafc;
-            border: 2px solid var(--border-color);
+            border: 1px solid var(--border-color);
             color: var(--text-main);
-            padding: 15px;
-            font-size: 15px;
+            padding: 8px 10px;
+            font-size: 13px;
             font-weight: 600;
-            border-radius: 16px;
+            border-radius: 10px;
             cursor: pointer;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             -webkit-tap-highlight-color: transparent;
             text-align: center;
+            height: 38px; /* Dibuat pendek & ramping */
         }
-        .sub-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
+        .sub-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         
         .btn-pop-indo:hover { border-color: var(--primary); background: #e0e7ff; }
+        .btn-pop-inggris { color: #0891b2; }
         .btn-pop-inggris:hover { border-color: #06b6d4; background: #cffafe; }
+        .btn-ambyar { color: #be185d; }
         .btn-ambyar:hover { border-color: #ec4899; background: #fce7f3; }
+        .btn-lawas { color: #b45309; }
         .btn-lawas:hover { border-color: #f59e0b; background: #fef3c7; }
-        
-        .folder-icon { font-size: 26px; }
 
         .sub-content {
             display: none;
             background: #f9fafb;
-            border-radius: 16px;
-            padding: 15px;
-            margin-bottom: 15px;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 10px;
             border: 1px solid var(--border-color);
         }
 
@@ -197,13 +197,12 @@
         .song-item {
             background: white;
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 10px;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
             transition: all 0.2s;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .song-item:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(99,102,241,0.08); }
         
         .song-title-row {
             display: flex;
@@ -213,33 +212,30 @@
         }
         
         .song-title {
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 500;
             color: var(--text-main);
             flex: 1;
         }
 
         .song-badge-detail {
-            font-size: 11px;
+            font-size: 10px;
             background: #f1f5f9;
             color: var(--info);
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 3px 6px;
+            border-radius: 5px;
             font-weight: 600;
-            margin-right: 10px;
+            margin-right: 6px;
             border: 1px solid #e0f2fe;
-            display: flex;
-            align-items: center;
-            gap: 4px;
         }
 
-        .music-icon { opacity: 0.5; font-size: 12px; flex-shrink: 0; }
+        .music-icon { opacity: 0.5; font-size: 11px; flex-shrink: 0; }
 
         /* Detail Lagu */
         .song-details {
             display: none;
-            margin-top: 15px;
-            padding-top: 15px;
+            margin-top: 10px;
+            padding-top: 10px;
             border-top: 1px dashed var(--border-color);
             animation: fadeIn 0.3s ease;
         }
@@ -247,15 +243,15 @@
         .info-box {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 15px;
-            font-size: 13px;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 12px;
         }
 
         .info-row {
             display: flex;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             align-items: flex-start;
         }
         .info-row:last-child { margin-bottom: 0; }
@@ -263,12 +259,12 @@
         .info-label {
             font-weight: 600;
             color: var(--text-muted);
-            width: 115px;
+            width: 100px;
             flex-shrink: 0;
-            padding-top: 2px;
+            padding-top: 1px;
         }
 
-        .info-value { color: var(--text-main); font-weight: 500; flex: 1; padding-top: 2px; }
+        .info-value { color: var(--text-main); font-weight: 500; flex: 1; padding-top: 1px; }
         
         .info-link {
             color: var(--primary);
@@ -278,12 +274,10 @@
             align-items: center;
             gap: 4px;
             background: #e0e7ff;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            transition: background 0.2s;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 11px;
         }
-        .info-link:hover { background: #c7d2fe; }
         .info-link.empty { background: #f3f4f6; color: #9ca3af; pointer-events: none; }
 
         .admin-controls { display: none; }
@@ -292,20 +286,20 @@
         .action-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 6px;
+            margin-bottom: 8px;
         }
         
         .move-action {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
             background: #f8fafc;
-            padding: 8px 12px;
-            border-radius: 10px;
-            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            gap: 6px;
             width: 100%;
             box-sizing: border-box;
         }
@@ -313,42 +307,40 @@
         select.custom-select {
             background: white;
             border: 1px solid var(--border-color);
-            padding: 6px 10px;
-            border-radius: 8px;
+            padding: 4px 8px;
+            border-radius: 6px;
             font-family: 'Poppins', sans-serif;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             color: var(--primary);
-            cursor: pointer;
             outline: none;
-            max-width: 150px;
         }
 
         .btn-mini {
             flex: 1;
-            padding: 8px;
+            padding: 6px;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-family: 'Poppins', sans-serif;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             color: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
         .btn-edit { background: var(--warning); }
         .btn-delete { background: var(--danger); }
 
         .category-header {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--text-muted);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -358,9 +350,9 @@
             background: #e5e7eb;
             color: #4b5563;
             border: none;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 11px;
             cursor: pointer;
             font-weight: 600;
         }
@@ -374,37 +366,35 @@
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 15px;
         }
         .modal-content {
             background: white;
             width: 100%;
-            max-width: 400px;
-            border-radius: 20px;
-            padding: 20px;
-            max-height: 90vh;
+            max-width: 380px;
+            border-radius: 16px;
+            padding: 15px;
+            max-height: 85vh;
             overflow-y: auto;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             animation: fadeIn 0.3s ease;
         }
-        .modal-content h3 { margin-top: 0; color: var(--text-main); font-size: 18px; margin-bottom: 15px; }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--text-muted); }
-        .form-group input, .form-group select, .form-group textarea {
+        .modal-content h3 { margin-top: 0; color: var(--text-main); font-size: 16px; margin-bottom: 12px; }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 3px; color: var(--text-muted); }
+        .form-group input, .form-group select {
             width: 100%;
-            padding: 10px 12px;
+            padding: 8px 10px;
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 8px;
             font-family: 'Poppins', sans-serif;
-            font-size: 14px;
+            font-size: 13px;
             box-sizing: border-box;
         }
-        .form-group textarea { resize: vertical; min-height: 60px; }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); outline: none; }
-        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-actions { display: flex; gap: 8px; margin-top: 15px; }
         .modal-actions button {
-            flex: 1; padding: 12px; border: none; border-radius: 10px;
-            font-family: 'Poppins', sans-serif; font-weight: 600; cursor: pointer;
+            flex: 1; padding: 10px; border: none; border-radius: 8px;
+            font-family: 'Poppins', sans-serif; font-weight: 600; cursor: pointer; font-size: 13px;
         }
         .btn-cancel { background: #e5e7eb; color: var(--text-main); }
         .btn-save { background: var(--primary); color: white; }
@@ -412,14 +402,6 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-5px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 480px) {
-            body { padding: 10px 10px 150px 10px; }
-            .container { padding: 15px 15px 80px 15px; }
-            .info-label { width: 95px; font-size: 12px; }
-            .info-value, .info-link { font-size: 12px; }
-            .song-badge-detail { font-size: 10px; padding: 3px 6px; }
         }
     </style>
 </head>
@@ -445,19 +427,19 @@
             <input type="text" id="search-Input" oninput="searchLagu(this.value)" placeholder="Cari lagu di playlist...">
         </div>
         
-        <!-- 4 Kotak Kategori -->
+        <!-- 4 Kotak Kategori Ramping & Ringkas -->
         <div class="folders-grid">
             <div class="sub-btn btn-pop-indo" onclick="openFolder('PopIndo')">
-                <span class="folder-icon">🎸</span><span>Pop Indo</span>
+                <span>Pop Indo</span>
             </div>
             <div class="sub-btn btn-pop-inggris" onclick="openFolder('PopInggris')">
-                <span class="folder-icon">🎧</span><span style="color: #0891b2;">Pop Inggris</span>
+                <span>Pop Inggris</span>
             </div>
             <div class="sub-btn btn-ambyar" onclick="openFolder('Ambyar')">
-                <span class="folder-icon">💔</span><span style="color: #be185d;">Ambyar</span>
+                <span>Ambyar</span>
             </div>
             <div class="sub-btn btn-lawas" onclick="openFolder('Lawas')">
-                <span class="folder-icon">📻</span><span style="color: #b45309;">Lawas</span>
+                <span>Lawas</span>
             </div>
         </div>
 
@@ -508,8 +490,8 @@
                 <select id="inputCategory" required>
                     <option value="PopIndo">Pop Indo</option>
                     <option value="PopInggris">Pop Inggris</option>
-                    <option value="Ambyar">Ambyar 💔</option>
-                    <option value="Lawas">Lawas 📻</option>
+                    <option value="Ambyar">Ambyar</option>
+                    <option value="Lawas">Lawas</option>
                 </select>
             </div>
             <div class="form-group">
@@ -631,7 +613,7 @@
     const folderKeys = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas'];
     let isAdmin = false;
 
-    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v11'));
+    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v12'));
     if (!daftarLagu || daftarLagu.length === 0) { 
         daftarLagu = defaultData;
     }
@@ -725,8 +707,8 @@
                         <select class="custom-select" onchange="pindahKategori(${index}, this.value)">
                             <option value="PopIndo" ${lagu.category === 'PopIndo' ? 'selected' : ''}>Pop Indo</option>
                             <option value="PopInggris" ${lagu.category === 'PopInggris' ? 'selected' : ''}>Pop Inggris</option>
-                            <option value="Ambyar" ${lagu.category === 'Ambyar' ? 'selected' : ''}>Ambyar 💔</option>
-                            <option value="Lawas" ${lagu.category === 'Lawas' ? 'selected' : ''}>Lawas 📻</option>
+                            <option value="Ambyar" ${lagu.category === 'Ambyar' ? 'selected' : ''}>Ambyar</option>
+                            <option value="Lawas" ${lagu.category === 'Lawas' ? 'selected' : ''}>Lawas</option>
                         </select>
                     </div>
                 `;
@@ -775,7 +757,7 @@
             if(targetList) { targetList.appendChild(li); }
         });
         
-        localStorage.setItem('setlistTiponkData_v11', JSON.stringify(daftarLagu));
+        localStorage.setItem('setlistTiponkData_v12', JSON.stringify(daftarLagu));
     }
 
     function toggleDetails(element) {
@@ -794,6 +776,7 @@
         filter = filter.toLowerCase();
         const container = document.getElementById('container-Playlist');
         const items = container.getElementsByClassName('song-item');
+        const foldersGrid = document.querySelector('.folders-grid');
 
         let foundCategories = {
             PopIndo: false,
@@ -817,10 +800,14 @@
         }
 
         if (filter.length > 0) {
+            // Sembunyikan kotak folder tombol saat mengetik agar layar lebih lega
+            foldersGrid.style.display = 'none';
             folderKeys.forEach(cat => {
                 document.getElementById(`content-${cat}`).style.display = foundCategories[cat] ? 'block' : 'none';
             });
         } else {
+            // Tampilkan kembali folder tombol jika kolom cari kosong
+            foldersGrid.style.display = 'grid';
             folderKeys.forEach(closeFolder);
         }
     }
