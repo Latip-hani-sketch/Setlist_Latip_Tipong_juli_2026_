@@ -257,17 +257,6 @@
             flex: 1;
         }
 
-        /* Inline Input saat Edit di Kolom */
-        .inline-edit-input {
-            flex: 1;
-            padding: 6px 10px;
-            border: 1.5px solid var(--primary);
-            border-radius: 6px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 13px;
-            outline: none;
-        }
-
         .song-badge-detail {
             font-size: 10px;
             background: #f1f5f9;
@@ -592,7 +581,7 @@
     </div>
 </div>
 
-<!-- Modal Form Tambah/Edit -->
+<!-- Modal Form Tambah/Edit Lagu Utama (Pop Indo, etc.) -->
 <div id="songModal" class="modal-overlay">
     <div class="modal-content">
         <h3 id="modalTitle">Tambah Lagu Baru</h3>
@@ -640,6 +629,48 @@
             <div class="modal-actions">
                 <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
                 <button type="submit" class="btn-save">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL FORM EDIT KHUSUS SESI MANGGUNG -->
+<div id="editSessionModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>✏️ Edit Lagu & Chord Sesi</h3>
+        <form onsubmit="saveSessionSongEdit(event)">
+            <div class="form-group">
+                <label>Judul Lagu</label>
+                <input type="text" id="editSesiTitle" required>
+            </div>
+            <div class="form-group">
+                <label>🎸 Chord Asli (Original)</label>
+                <input type="text" id="editSesiChordAsli" placeholder="Contoh: D#">
+            </div>
+            <div class="form-group">
+                <label>🧑 Chord Cowok</label>
+                <input type="text" id="editSesiChordCowok" placeholder="Contoh: E">
+            </div>
+            <div class="form-group">
+                <label>👩 Chord Cewek</label>
+                <input type="text" id="editSesiChordCewek" placeholder="Contoh: A">
+            </div>
+            <div class="form-group">
+                <label>📝 Catatan / Modulasi</label>
+                <input type="text" id="editSesiCatatan" placeholder="Contoh: Intro Fm">
+            </div>
+            <div class="form-group">
+                <label>🔗 Link Situs Chord</label>
+                <input type="url" id="editSesiLinkChord" placeholder="https://...">
+            </div>
+            <div class="form-group">
+                <label>▶️ Link YouTube</label>
+                <input type="url" id="editSesiLinkYoutube" placeholder="https://...">
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeEditSessionModal()">Batal</button>
+                <button type="submit" class="btn-save" style="background:#8b5cf6">Simpan Perubahan</button>
             </div>
         </form>
     </div>
@@ -795,7 +826,7 @@
     const folderKeys = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas'];
     let isAdmin = false;
 
-    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v20'));
+    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v21'));
     if (!daftarLagu || daftarLagu.length === 0) { 
         daftarLagu = defaultData;
     }
@@ -958,7 +989,7 @@
             if(targetList) { targetList.appendChild(li); }
         });
         
-        localStorage.setItem('setlistTiponkData_v20', JSON.stringify(daftarLagu));
+        localStorage.setItem('setlistTiponkData_v21', JSON.stringify(daftarLagu));
     }
 
     function toggleDetails(element) {
@@ -1212,6 +1243,48 @@
         }
     }
 
+    // HELPER: BUAT ITEM LAGU UNTUK SESI MANGGUNG (LENGKAP DENGAN DETAIL)
+    function buildSessionSongItem(rawLine, foundSong = null, customDetails = null) {
+        const li = document.createElement('li');
+        li.className = 'song-item';
+
+        // Ambil data detail jika ada
+        const chordAsli = customDetails ? customDetails.chordAsli : (foundSong ? foundSong.chordAsli : "");
+        const chordCowok = customDetails ? customDetails.chordCowok : (foundSong ? foundSong.chordCowok : "");
+        const chordCewek = customDetails ? customDetails.chordCewek : (foundSong ? foundSong.chordCewek : "");
+        const catatan = customDetails ? customDetails.catatan : (foundSong ? foundSong.catatan : "");
+        const linkChord = customDetails ? customDetails.linkChord : (foundSong ? foundSong.linkChord : "");
+        const linkYoutube = customDetails ? customDetails.linkYoutube : (foundSong ? foundSong.linkYoutube : "");
+
+        const btnChordClass = linkChord ? "info-link" : "info-link empty";
+        const btnChordText = linkChord ? "Buka Web 🔗" : "Kosong";
+        const btnYtClass = linkYoutube ? "info-link" : "info-link empty";
+        const btnYtText = linkYoutube ? "Tonton ▶️" : "Kosong";
+
+        let dbBadge = foundSong ? `<small style="color:var(--success); font-weight:600;">(Ada di DB)</small>` : ``;
+
+        li.innerHTML = `
+            <div class="song-title-row">
+                <span class="song-title" onclick="toggleDetails(this)">📌 ${rawLine} ${dbBadge}</span>
+                <div class="session-item-actions">
+                    <button class="btn-sesi-mini" onclick="openEditSessionModal(this)">✏️ Edit</button>
+                    <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
+                </div>
+            </div>
+            <div class="song-details">
+                <div class="info-box">
+                    <div class="info-row"><span class="info-label">🎸 Chord Asli</span><span class="info-value val-chord-asli">: ${chordAsli || "-"}</span></div>
+                    <div class="info-row"><span class="info-label">🧑 Chord Cowok</span><span class="info-value val-chord-cowok">: ${chordCowok || "-"}</span></div>
+                    <div class="info-row"><span class="info-label">👩 Chord Cewek</span><span class="info-value val-chord-cewek">: ${chordCewek || "-"}</span></div>
+                    <div class="info-row"><span class="info-label">📝 Catatan</span><span class="info-value val-catatan">: ${catatan || "-"}</span></div>
+                    <div class="info-row"><span class="info-label">🌐 Web Chord</span><span class="info-value val-link-chord">: <a href="${linkChord || '#'}" target="_blank" class="${btnChordClass}">${btnChordText}</a></span></div>
+                    <div class="info-row"><span class="info-label">📺 YouTube</span><span class="info-value val-link-yt">: <a href="${linkYoutube || '#'}" target="_blank" class="${btnYtClass}">${btnYtText}</a></span></div>
+                </div>
+            </div>
+        `;
+        return li;
+    }
+
     // TAB 1: PASTE TEKS ACAK
     function processPasteSetlist() {
         const text = document.getElementById('pasteTextArea').value.trim();
@@ -1230,7 +1303,6 @@
             let rawLine = line.trim();
             if(!rawLine || rawLine === '-') return;
 
-            // Cek Header Sesi
             if(rawLine.toLowerCase().includes('sesi') || rawLine.toLowerCase().includes('optional') || rawLine.toLowerCase().includes('set')) {
                 const sessionHeader = document.createElement('div');
                 sessionHeader.className = 'session-title-header';
@@ -1256,45 +1328,7 @@
                 return dbTitle.includes(searchKey) || searchKey.includes(dbTitle);
             });
 
-            const li = document.createElement('li');
-            li.className = 'song-item';
-
-            if(foundSong) {
-                const btnChordClass = foundSong.linkChord ? "info-link" : "info-link empty";
-                const btnChordText = foundSong.linkChord ? "Buka Web 🔗" : "Kosong";
-                const btnYtClass = foundSong.linkYoutube ? "info-link" : "info-link empty";
-                const btnYtText = foundSong.linkYoutube ? "Tonton ▶️" : "Kosong";
-
-                li.innerHTML = `
-                    <div class="song-title-row">
-                        <span class="song-title" onclick="toggleDetails(this)">📌 ${rawLine} <small style="color:var(--success); font-weight:600;">(Ada di DB)</small></span>
-                        <div class="session-item-actions">
-                            <button class="btn-sesi-mini" onclick="enableInlineEdit(this)">✏️</button>
-                            <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
-                        </div>
-                    </div>
-                    <div class="song-details">
-                        <div class="info-box">
-                            <div class="info-row"><span class="info-label">🎸 Chord Asli</span><span class="info-value">: ${foundSong.chordAsli || "-"}</span></div>
-                            <div class="info-row"><span class="info-label">🧑 Chord Cowok</span><span class="info-value">: ${foundSong.chordCowok || "-"}</span></div>
-                            <div class="info-row"><span class="info-label">👩 Chord Cewek</span><span class="info-value">: ${foundSong.chordCewek || "-"}</span></div>
-                            <div class="info-row"><span class="info-label">📝 Catatan</span><span class="info-value">: ${foundSong.catatan || "-"}</span></div>
-                            <div class="info-row"><span class="info-label">🌐 Web Chord</span><span class="info-value">: <a href="${foundSong.linkChord || '#'}" target="_blank" class="${btnChordClass}">${btnChordText}</a></span></div>
-                            <div class="info-row"><span class="info-label">📺 YouTube</span><span class="info-value">: <a href="${foundSong.linkYoutube || '#'}" target="_blank" class="${btnYtClass}">${btnYtText}</a></span></div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                li.innerHTML = `
-                    <div class="song-title-row">
-                        <span class="song-title">${rawLine} <small style="color:var(--danger); font-weight:500;">(Belum Ada Chord)</small></span>
-                        <div class="session-item-actions">
-                            <button class="btn-sesi-mini" onclick="enableInlineEdit(this)">✏️</button>
-                            <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
-                        </div>
-                    </div>
-                `;
-            }
+            const li = buildSessionSongItem(rawLine, foundSong);
 
             if(!currentUl.parentNode) {
                 listContainer.appendChild(currentUl);
@@ -1323,18 +1357,7 @@
             listContainer.appendChild(sessionHeader);
 
             const ul = document.createElement('ul');
-            
-            const li = document.createElement('li');
-            li.className = 'song-item';
-            li.innerHTML = `
-                <div class="song-title-row">
-                    <span class="song-title">📌 (Klik ✏️ untuk isi nama lagu)</span>
-                    <div class="session-item-actions">
-                        <button class="btn-sesi-mini" onclick="enableInlineEdit(this)">✏️</button>
-                        <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
-                    </div>
-                </div>
-            `;
+            const li = buildSessionSongItem("(Klik ✏️ Edit untuk isi lagu)");
             ul.appendChild(li);
             listContainer.appendChild(ul);
         });
@@ -1353,113 +1376,73 @@
             headerDiv.after(ul);
         }
 
-        const li = document.createElement('li');
-        li.className = 'song-item';
-        li.innerHTML = `
-            <div class="song-title-row">
-                <input type="text" class="inline-edit-input" placeholder="Ketik nama lagu di sini..." autofocus>
-                <div class="session-item-actions">
-                    <button class="btn-sesi-mini" style="color:var(--success);" onclick="saveInlineEdit(this)">✔️</button>
-                    <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
-                </div>
-            </div>
-        `;
+        const li = buildSessionSongItem("(Klik ✏️ Edit untuk isi lagu)");
         ul.appendChild(li);
-
-        // Fokuskan kursor ke input yang baru dibuat
-        const inputEl = li.querySelector('.inline-edit-input');
-        if(inputEl) inputEl.focus();
-    }
-
-    // ================= EDIT INLINE LANGSUNG DI KOLOM =================
-    function enableInlineEdit(btnEl) {
-        const titleRow = btnEl.closest('.song-title-row');
-        const titleSpan = titleRow.querySelector('.song-title');
         
-        // Ambil teks murni tanpa emblem badge
-        let oldText = titleSpan.innerText.replace(/📌|\(Ada di DB\)|\(Belum Ada Chord\)|\(Klik ✏️ untuk isi nama lagu\)/g, '').trim();
-
-        titleRow.innerHTML = `
-            <input type="text" class="inline-edit-input" value="${oldText}" autofocus>
-            <div class="session-item-actions">
-                <button class="btn-sesi-mini" style="color:var(--success);" onclick="saveInlineEdit(this)">✔️</button>
-                <button class="btn-sesi-mini" style="color:var(--danger);" onclick="cancelInlineEdit(this, '${oldText}')">✖️</button>
-            </div>
-        `;
-
-        const inputEl = titleRow.querySelector('.inline-edit-input');
-        inputEl.focus();
-        inputEl.select();
-
-        // Mengizinkan pencetan tombol Enter di keyboard untuk menyimpan
-        inputEl.addEventListener('keyup', function(e) {
-            if(e.key === 'Enter') {
-                saveInlineEdit(titleRow.querySelector('.btn-sesi-mini'));
-            }
-        });
+        // Langsung buka modal edit untuk slot baru
+        openEditSessionModal(li.querySelector('.btn-sesi-mini'));
     }
 
-    // Simpan Perubahan Input Kolom
-    function saveInlineEdit(btnEl) {
-        const titleRow = btnEl.closest('.song-title-row');
-        const inputEl = titleRow.querySelector('.inline-edit-input');
-        let newTitle = inputEl.value.trim();
+    // ================= EDIT FORM LENGKAP KHUSUS SESI =================
+    let currentEditingLi = null;
 
-        if(newTitle === '') {
-            newTitle = "(Lagu Kosong)";
-        }
+    function openEditSessionModal(btnEl) {
+        currentEditingLi = btnEl.closest('li.song-item');
+        
+        // Ambil data judul
+        const titleSpan = currentEditingLi.querySelector('.song-title');
+        let oldTitle = titleSpan.innerText.replace(/📌|\(Ada di DB\)|\(Belum Ada Chord\)|\(Klik ✏️ Edit untuk isi lagu\)/g, '').trim();
 
-        // Cek ke DB jika ada pencocokan lagu
-        let searchKey = newTitle.toLowerCase().replace(/\(.*?\)/g, '').trim();
+        // Ambil data nilai chord dari info-box
+        const valChordAsli = currentEditingLi.querySelector('.val-chord-asli').innerText.replace(':', '').trim();
+        const valChordCowok = currentEditingLi.querySelector('.val-chord-cowok').innerText.replace(':', '').trim();
+        const valChordCewek = currentEditingLi.querySelector('.val-chord-cewek').innerText.replace(':', '').trim();
+        const valCatatan = currentEditingLi.querySelector('.val-catatan').innerText.replace(':', '').trim();
+        
+        const chordAnchor = currentEditingLi.querySelector('.val-link-chord a');
+        const valLinkChord = (chordAnchor && chordAnchor.getAttribute('href') !== '#') ? chordAnchor.getAttribute('href') : '';
+
+        const ytAnchor = currentEditingLi.querySelector('.val-link-yt a');
+        const valLinkYt = (ytAnchor && ytAnchor.getAttribute('href') !== '#') ? ytAnchor.getAttribute('href') : '';
+
+        // Masukkan ke form modal edit
+        document.getElementById('editSesiTitle').value = oldTitle;
+        document.getElementById('editSesiChordAsli').value = valChordAsli === '-' ? '' : valChordAsli;
+        document.getElementById('editSesiChordCowok').value = valChordCowok === '-' ? '' : valChordCowok;
+        document.getElementById('editSesiChordCewek').value = valChordCewek === '-' ? '' : valChordCewek;
+        document.getElementById('editSesiCatatan').value = valCatatan === '-' ? '' : valCatatan;
+        document.getElementById('editSesiLinkChord').value = valLinkChord;
+        document.getElementById('editSesiLinkYoutube').value = valLinkYt;
+
+        document.getElementById('editSessionModal').style.display = 'flex';
+    }
+
+    function closeEditSessionModal() {
+        document.getElementById('editSessionModal').style.display = 'none';
+        currentEditingLi = null;
+    }
+
+    function saveSessionSongEdit(event) {
+        event.preventDefault();
+        if(!currentEditingLi) return;
+
+        const title = document.getElementById('editSesiTitle').value.trim();
+        const chordAsli = document.getElementById('editSesiChordAsli').value.trim();
+        const chordCowok = document.getElementById('editSesiChordCowok').value.trim();
+        const chordCewek = document.getElementById('editSesiChordCewek').value.trim();
+        const catatan = document.getElementById('editSesiCatatan').value.trim();
+        const linkChord = document.getElementById('editSesiLinkChord').value.trim();
+        const linkYoutube = document.getElementById('editSesiLinkYoutube').value.trim();
+
+        // Cek apakah judul baru cocok dengan lagu di DB
+        let searchKey = title.toLowerCase().replace(/\(.*?\)/g, '').trim();
         let foundSong = daftarLagu.find(l => l.title.toLowerCase().includes(searchKey));
-        const liItem = titleRow.closest('li.song-item');
 
-        if(foundSong && searchKey.length > 2) {
-            const btnChordClass = foundSong.linkChord ? "info-link" : "info-link empty";
-            const btnChordText = foundSong.linkChord ? "Buka Web 🔗" : "Kosong";
-            const btnYtClass = foundSong.linkYoutube ? "info-link" : "info-link empty";
-            const btnYtText = foundSong.linkYoutube ? "Tonton ▶️" : "Kosong";
+        const customDetails = { chordAsli, chordCowok, chordCewek, catatan, linkChord, linkYoutube };
+        const newLi = buildSessionSongItem(title, (searchKey.length > 2 ? foundSong : null), customDetails);
 
-            liItem.innerHTML = `
-                <div class="song-title-row">
-                    <span class="song-title" onclick="toggleDetails(this)">📌 ${newTitle} <small style="color:var(--success); font-weight:600;">(Ada di DB)</small></span>
-                    <div class="session-item-actions">
-                        <button class="btn-sesi-mini" onclick="enableInlineEdit(this)">✏️</button>
-                        <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
-                    </div>
-                </div>
-                <div class="song-details">
-                    <div class="info-box">
-                        <div class="info-row"><span class="info-label">🎸 Chord Asli</span><span class="info-value">: ${foundSong.chordAsli || "-"}</span></div>
-                        <div class="info-row"><span class="info-label">🧑 Chord Cowok</span><span class="info-value">: ${foundSong.chordCowok || "-"}</span></div>
-                        <div class="info-row"><span class="info-label">👩 Chord Cewek</span><span class="info-value">: ${foundSong.chordCewek || "-"}</span></div>
-                        <div class="info-row"><span class="info-label">📝 Catatan</span><span class="info-value">: ${foundSong.catatan || "-"}</span></div>
-                        <div class="info-row"><span class="info-label">🌐 Web Chord</span><span class="info-value">: <a href="${foundSong.linkChord || '#'}" target="_blank" class="${btnChordClass}">${btnChordText}</a></span></div>
-                        <div class="info-row"><span class="info-label">📺 YouTube</span><span class="info-value">: <a href="${foundSong.linkYoutube || '#'}" target="_blank" class="${btnYtClass}">${btnYtText}</a></span></div>
-                    </div>
-                </div>
-            `;
-        } else {
-            titleRow.innerHTML = `
-                <span class="song-title">📌 ${newTitle}</span>
-                <div class="session-item-actions">
-                    <button class="btn-sesi-mini" onclick="enableInlineEdit(this)">✏️</button>
-                    <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
-                </div>
-            `;
-        }
-    }
-
-    // Batal Edit
-    function cancelInlineEdit(btnEl, oldText) {
-        const titleRow = btnEl.closest('.song-title-row');
-        titleRow.innerHTML = `
-            <span class="song-title">📌 ${oldText}</span>
-            <div class="session-item-actions">
-                <button class="btn-sesi-mini" onclick="enableInlineEdit(this)">✏️</button>
-                <button class="btn-sesi-mini" style="color:var(--danger);" onclick="deleteSessionItem(this)">🗑️</button>
-            </div>
-        `;
+        currentEditingLi.replaceWith(newLi);
+        closeEditSessionModal();
     }
 
     // Hapus Baris Lagu di Sesi
