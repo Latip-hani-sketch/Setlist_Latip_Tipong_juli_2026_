@@ -63,7 +63,6 @@
             flex: 1;
         }
 
-        /* Status Badge Admin / Viewer */
         .mode-badge {
             font-size: 11px;
             padding: 5px 10px;
@@ -77,40 +76,36 @@
         .mode-viewer { background: #fef3c7; color: #b45309; }
         .mode-admin { background: #d1fae5; color: #047857; }
 
-        /* Group Tombol Atas (Tambah Lagu & Import TXT) */
+        /* Group Tombol Atas */
         .action-btn-group {
             display: flex;
-            gap: 12px; /* Jarak dibuat lebih renggang & rapi */
-            margin-bottom: 18px;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
 
         .btn-action-main {
             flex: 1;
+            min-width: 120px;
             border: none;
-            padding: 12px 10px;
+            padding: 10px 8px;
             border-radius: 12px;
             font-family: 'Poppins', sans-serif;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             transition: all 0.2s ease;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
         .btn-action-main:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
 
-        .btn-add-theme {
-            background: var(--text-main);
-            color: white;
-        }
-
-        .btn-import-theme {
-            background: var(--success);
-            color: white;
-        }
+        .btn-add-theme { background: var(--text-main); color: white; }
+        .btn-import-theme { background: var(--success); color: white; }
+        .btn-paste-theme { background: #8b5cf6; color: white; width: 100%; margin-top: -4px; }
 
         /* Main Folder Button */
         .main-btn {
@@ -322,9 +317,6 @@
         }
         .info-link.empty { background: #f3f4f6; color: #9ca3af; pointer-events: none; }
 
-        .admin-inline-controls { display: none; }
-        .admin-inline-controls.active { display: block; }
-
         .action-group {
             display: flex;
             flex-wrap: wrap;
@@ -375,6 +367,19 @@
         }
         .btn-edit { background: var(--warning); }
         .btn-delete { background: var(--danger); }
+
+        /* Styling Khusus Sesi */
+        .session-title-header {
+            background: #6366f1;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            margin: 15px 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
         /* Modal Popup Form & Import */
         .modal-overlay {
@@ -432,10 +437,11 @@
         <button id="modeBtn" class="mode-badge mode-viewer" onclick="toggleAdminMode()">👁️ Penonton</button>
     </div>
     
-    <!-- Tombol Atas Tambah & Import TXT (Tampak Rapi & Memiliki Notifikasi jika Belum Login Admin) -->
+    <!-- Group Tombol Atas -->
     <div class="action-btn-group">
         <button class="btn-action-main btn-add-theme" onclick="openModal()">➕ Tambah Lagu</button>
         <button class="btn-action-main btn-import-theme" onclick="openImportModal()">📄 Import .txt</button>
+        <button class="btn-action-main btn-paste-theme" onclick="openPasteModal()">📋 Paste Setlist Sesi Manggung</button>
     </div>
 
     <!-- ==================== MAIN PLAYLIST ==================== -->
@@ -467,7 +473,16 @@
             </div>
         </div>
 
-        <!-- AREA HALAMAN FOLDER -->
+        <!-- AREA FOLDER HASIL PASTE SESI MANGGUNG -->
+        <div id="content-SesiManggung" class="sub-content">
+            <div class="category-header" style="color:#8b5cf6;">
+                <span>📋 SETLIST MANGGUNG (HASIL PASTE)</span>
+                <button class="close-folder" onclick="closeAllFolders()">⬅ Kembali</button>
+            </div>
+            <div id="list-SesiManggung"></div>
+        </div>
+
+        <!-- AREA HALAMAN FOLDER STANDARD -->
         <div id="content-PopIndo" class="sub-content">
             <div class="category-header">
                 <span>🎵 POP INDO</span>
@@ -601,6 +616,26 @@
     </div>
 </div>
 
+<!-- MODAL PASTE SETLIST MANGGUNG (SESI 1, SESI 2) -->
+<div id="pasteModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>📋 Paste Setlist Acak Manggung</h3>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
+            Tempelkan (Paste) salinan ketikan setlist anak-anak (misal: Sesi 1, Sesi 2). Sistem akan otomatis mencocokkan dengan chord di database kamu dan merapikannya!
+        </p>
+        
+        <div class="form-group">
+            <label>Tempel Teks di Sini:</label>
+            <textarea id="pasteTextArea" rows="10" placeholder="Contoh:&#10;Sesi 1 :&#10;Kau Curi Lagi (jrock)&#10;Without You (Mariah Carey)&#10;&#10;Sesi 2 :&#10;Sahabat sejati (SO7)&#10;Rungkad"></textarea>
+        </div>
+        
+        <div class="modal-actions">
+            <button type="button" class="btn-cancel" onclick="closePasteModal()">Batal</button>
+            <button type="button" class="btn-save" style="background:#8b5cf6" onclick="processPasteSetlist()">✨ Rapikan Setlist</button>
+        </div>
+    </div>
+</div>
+
 <script>
     const defaultData = [
         // ================= POP INDO =================
@@ -683,7 +718,7 @@
     const folderKeys = ['PopIndo', 'PopInggris', 'Ambyar', 'Lawas'];
     let isAdmin = false;
 
-    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v16'));
+    let daftarLagu = JSON.parse(localStorage.getItem('setlistTiponkData_v17'));
     if (!daftarLagu || daftarLagu.length === 0) { 
         daftarLagu = defaultData;
     }
@@ -743,8 +778,12 @@
         document.getElementById('folders-grid').style.display = 'none';
         document.getElementById('global-search-box').style.display = 'none';
         
-        folderKeys.forEach(cat => {
-            document.getElementById(`content-${cat}`).style.display = (cat === targetCategory) ? 'block' : 'none';
+        const allCategories = [...folderKeys, 'SesiManggung'];
+        allCategories.forEach(cat => {
+            const el = document.getElementById(`content-${cat}`);
+            if(el) {
+                el.style.display = (cat === targetCategory) ? 'block' : 'none';
+            }
             const searchInput = document.getElementById(`search-${cat}`);
             if(searchInput) {
                 searchInput.value = "";
@@ -756,8 +795,10 @@
     function closeAllFolders() {
         document.getElementById('folders-grid').style.display = 'grid';
         document.getElementById('global-search-box').style.display = 'block';
-        folderKeys.forEach(cat => {
-            document.getElementById(`content-${cat}`).style.display = 'none';
+        const allCategories = [...folderKeys, 'SesiManggung'];
+        allCategories.forEach(cat => {
+            const el = document.getElementById(`content-${cat}`);
+            if(el) el.style.display = 'none';
         });
     }
 
@@ -840,7 +881,7 @@
             if(targetList) { targetList.appendChild(li); }
         });
         
-        localStorage.setItem('setlistTiponkData_v16', JSON.stringify(daftarLagu));
+        localStorage.setItem('setlistTiponkData_v17', JSON.stringify(daftarLagu));
     }
 
     function toggleDetails(element) {
@@ -907,7 +948,6 @@
         }
     }
 
-    // Modal Form Tambah Lagu (Cek Status Admin)
     function openModal(index = -1) {
         if (!isAdmin) {
             alert("🔒 Akses Terkunci!\nSilakan login terlebih dahulu sebagai Admin untuk menambahkan lagu baru.");
@@ -985,10 +1025,9 @@
         }
     }
 
-    // Modal Import TXT (Cek Status Admin)
     function openImportModal() {
         if (!isAdmin) {
-            alert("🔒 Akses Terkunci!\nSilakan login terlebih dahulu sebagai Admin untuk meng-import lagu dari file .txt.");
+            alert("🔒 Akses Terkunci!\nSilakan login terlebih dahulu sebagai Admin untuk meng-import lagu.");
             return;
         }
         document.getElementById('importModal').style.display = 'flex';
@@ -1064,6 +1103,103 @@
         };
 
         reader.readAsText(file);
+    }
+
+    // ================= FITUR PASTE SETLIST SIKAT/SESI =================
+    function openPasteModal() {
+        document.getElementById('pasteModal').style.display = 'flex';
+        document.getElementById('pasteTextArea').value = '';
+    }
+
+    function closePasteModal() {
+        document.getElementById('pasteModal').style.display = 'none';
+    }
+
+    function processPasteSetlist() {
+        const text = document.getElementById('pasteTextArea').value.trim();
+        if(!text) {
+            alert("Silakan tempel (paste) teks setlist terlebih dahulu!");
+            return;
+        }
+
+        const lines = text.split(/\r?\n/);
+        const listContainer = document.getElementById('list-SesiManggung');
+        listContainer.innerHTML = ''; // Clear container
+
+        let currentUl = document.createElement('ul');
+
+        lines.forEach(line => {
+            let rawLine = line.trim();
+            if(!rawLine || rawLine === '-') return; // Abaikan baris kosong / strip
+
+            // Cek apakah baris adalah Judul Sesi (contoh: "Sesi 1:", "Sesi 2:", "Optional:")
+            if(rawLine.toLowerCase().includes('sesi') || rawLine.toLowerCase().includes('optional') || rawLine.toLowerCase().includes('set')) {
+                const sessionHeader = document.createElement('div');
+                sessionHeader.className = 'session-title-header';
+                sessionHeader.innerText = rawLine;
+                listContainer.appendChild(sessionHeader);
+
+                currentUl = document.createElement('ul');
+                listContainer.appendChild(currentUl);
+                return;
+            }
+
+            // Bersihkan kata-kata acak untuk dicocokkan ke database
+            let searchKey = rawLine.toLowerCase()
+                .replace(/^[\d+[\.\)\-]\s*/, '') // hapus angka
+                .replace(/\(.*?\)/g, '') // hapus teks dalam kurung
+                .replace(/[-]/g, ' ')
+                .trim();
+
+            // Cari lagu yang paling cocok di database
+            let foundSong = daftarLagu.find(l => {
+                let dbTitle = l.title.toLowerCase();
+                return dbTitle.includes(searchKey) || searchKey.includes(dbTitle);
+            });
+
+            const li = document.createElement('li');
+            li.className = 'song-item';
+
+            if(foundSong) {
+                // Jika ADA di database (Gunakan chord & info resmi)
+                const btnChordClass = foundSong.linkChord ? "info-link" : "info-link empty";
+                const btnChordText = foundSong.linkChord ? "Buka Web 🔗" : "Kosong";
+                const btnYtClass = foundSong.linkYoutube ? "info-link" : "info-link empty";
+                const btnYtText = foundSong.linkYoutube ? "Tonton ▶️" : "Kosong";
+
+                li.innerHTML = `
+                    <div class="song-title-row" onclick="toggleDetails(this)">
+                        <span class="song-title">📌 ${rawLine} <small style="color:var(--success); font-weight:600;">(Ada di DB)</small></span>
+                        <span class="song-badge-detail">Detail 📌</span>
+                    </div>
+                    <div class="song-details">
+                        <div class="info-box">
+                            <div class="info-row"><span class="info-label">🎸 Chord Asli</span><span class="info-value">: ${foundSong.chordAsli || "-"}</span></div>
+                            <div class="info-row"><span class="info-label">🧑 Chord Cowok</span><span class="info-value">: ${foundSong.chordCowok || "-"}</span></div>
+                            <div class="info-row"><span class="info-label">👩 Chord Cewek</span><span class="info-value">: ${foundSong.chordCewek || "-"}</span></div>
+                            <div class="info-row"><span class="info-label">📝 Catatan</span><span class="info-value">: ${foundSong.catatan || "-"}</span></div>
+                            <div class="info-row"><span class="info-label">🌐 Web Chord</span><span class="info-value">: <a href="${foundSong.linkChord || '#'}" target="_blank" class="${btnChordClass}">${btnChordText}</a></span></div>
+                            <div class="info-row"><span class="info-label">📺 YouTube</span><span class="info-value">: <a href="${foundSong.linkYoutube || '#'}" target="_blank" class="${btnYtClass}">${btnYtText}</a></span></div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Jika BELUM ADA di database
+                li.innerHTML = `
+                    <div class="song-title-row">
+                        <span class="song-title">${rawLine} <small style="color:var(--danger); font-weight:500;">(Belum Ada Chord)</small></span>
+                    </div>
+                `;
+            }
+
+            if(!currentUl.parentNode) {
+                listContainer.appendChild(currentUl);
+            }
+            currentUl.appendChild(li);
+        });
+
+        closePasteModal();
+        openFolder('SesiManggung');
     }
 
     renderSongs();
